@@ -1,0 +1,24 @@
+{
+  "name": "color-picker",
+  "version": "1.0.0",
+  "description": "Provide user interface to select color",
+  "main": "js/ui.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "keywords": [
+    "ui",
+    "color",
+    "selector",
+    "picker"
+  ],
+  "author": "Toshiyuki Ogawa",
+  "license": "ISC",
+  "devDependencies": {
+    "html-webpack-plugin": "^4.3.0",
+    "source-map-loader": "^1.0.1",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  }
+}
