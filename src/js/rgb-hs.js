@@ -278,7 +278,7 @@ class RgbHs {
       theta = Math.PI * 2 + theta;
     } else if (y == 0 || y == -.0) {
       if (x < 0) {
-        theta = Math.PI * 2;
+        theta = Math.PI;
       }
     }
     const xyRadius = Math.sqrt(x * x + y * y) / r;
