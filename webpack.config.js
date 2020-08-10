@@ -1,16 +1,22 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ExtractCss = require('mini-css-extract-plugin')
 const path = require('path')
 
 webpackSetting = {}
 
+webpackSetting.mode = 'development'
+
 webpackSetting.entry = {
-  test: './src/js/color-test.js'
+  test: ['./src/js/color-test.js',
+          './src/less/ui.less']
 }
 
 webpackSetting.plugins =[ 
   new HtmlWebpackPlugin({
     chunks:['test'],
     template: 'src/js/color-test.ejs'
+  }),
+  new ExtractCss({
   })
 ]
 webpackSetting.devtool = 'source-map' 
@@ -20,6 +26,20 @@ webpackSetting.module = {
       test: /\.js$/,
       enforce: 'pre',
       use: ['source-map-loader']
+    },
+    {
+      test: /\.less$/,
+      use: [
+        {
+          loader: ExtractCss.loader
+        },
+        {
+          loader: 'css-loader'
+        },
+        {
+          loader: 'less-loader'
+        }
+      ]
     }
   ]
 }

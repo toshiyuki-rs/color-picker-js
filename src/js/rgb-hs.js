@@ -367,6 +367,7 @@ class RgbHs {
     };
     return result;
   }
+
   static createColorCircleProgress(radius, indexValue, notCircleValue) {
     let diameter;
     diameter = 2 * radius;
