@@ -7,6 +7,10 @@
     ".": "src/js/ui.js",
     "./rgb-hs": "src/js/rgb-hs.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toshiyuki-rs/color-picker-js.git"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack"
@@ -18,7 +22,10 @@
     "picker"
   ],
   "author": "Toshiyuki Ogawa",
-  "license": "ISC",
+  "license": "ISC", 
+  "bugs": {
+    "url": "https://github.com/toshiyuki-rs/color-picker-js/issues"
+  },
   "devDependencies": {
     "@babel/core": "^7.11.1",
     "babel-loader": "^8.1.0",
