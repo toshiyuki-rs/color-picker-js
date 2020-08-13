@@ -10,8 +10,7 @@ class UI {
    */
   static get defaultTemplate() {
     return `<div class="oc-color-controller">
-  <button class="oc-index-decrement">&#xff0d</button>
-  <button class="oc-index-increment">&#xff0b;</button>
+  <input class="oc-value" type="number" min="0" max="255">
 </div>
 <div class="oc-color-circle-container">
   <canvas class="oc-color-circle" width="200px" height="200px"></canvas>
@@ -24,8 +23,7 @@ class UI {
    */
   static get defaultClassNameMapping() {
     return {
-      incrementIndex: 'oc-index-increment',
-      decrementIndex: 'oc-index-decrement',
+      value: 'oc-value',
       colorCircleCanvas: 'oc-color-circle'
     }
   }
@@ -106,8 +104,77 @@ class UI {
     }
     if (doSet) {
       this.indexValueField = value
-      this.postUpdateColorCircleCanvas()
+      if (this.updateUi) {
+        setTimeout(function() { this.syncValueUiWithValue() }.bind(this))
+        this.postUpdateColorCircleCanvas()
+      }
     }
+  }
+
+  /**
+   * index value as integer
+   */
+  get indexValueInt() {
+    let result = this.indexValue
+    if (typeof result !== 'undefined') {
+      result = parseInt(result * 0xff)
+    }
+    return result
+  }
+
+  set indexValueInt(value) {
+    if (typeof value !== 'undefined') {
+      value = parseFloat(value) / 0xff
+    }
+    this.indexValue = value
+  }
+
+  /**
+   * index value on user interface
+   */
+  get indexValueUi() {
+    let result
+    let valueUi = this.valueUi
+    if (typeof valueUi !== 'undefined') {
+      const num = parseInt(valueUi.value)
+      if (!isNaN(num)) {
+        result = num
+      }
+    }
+    return result
+  }
+
+  /**
+   * index value on user interface
+   */
+  set indexValueUi(value) {
+    const thisValue = this.indexValueUi
+    let doSet = false
+    doSet = typeof value !== 'undefined'
+    if (doSet) {
+      doSet = thisValue != value
+    }
+    if (doSet) {
+      let valueUi = this.valueUi
+      valueUi.value = value
+      if (this.syncFieldWithUi) {
+        setTimeout(function() { this.syncValueWithUi() }.bind(this))
+      }
+    }
+  }
+
+
+  
+  /**
+   *  value user interface
+   */
+  get valueUi() {
+    let result
+    if (typeof this.rootElement !== 'undefined') {
+      result = this.rootElement.getElementsByClassName(
+        this.classMapping.value)[0]
+    }
+    return result
   }
 
   /**
@@ -129,7 +196,9 @@ class UI {
     }
     if (doSet) {
       this.colorTypeField = value
-      this.postUpdateColorCircleCanvas()
+      if (this.updateUi) {
+        this.postUpdateColorCircleCanvas()
+      }
     }
   }
 
@@ -152,7 +221,7 @@ class UI {
     return this.pickerLocationField
   }
   set pickerLocation(value) {
-    const thisValue = this.getPickerLocation
+    const thisValue = this.pickerLocation
     let doSet = false
     if (typeof thisValue !== 'undefined') {
       if (typeof value !== 'undefined') {
@@ -168,7 +237,12 @@ class UI {
     }
     if (doSet) {
       this.pickerLocationField = value
-      this.postUpdateColorCircleCanvas()
+      if (this.updateUi) {
+        this.postUpdateColorCircleCanvas()
+      }
+      if (this.raiseEvent) {
+        this.notify('pickerLocation')
+      }
     }
   }
 
@@ -194,7 +268,9 @@ class UI {
     }
     if (doSet) {
       this.pickerMarkerField = value
-      this.postUpdateColorCircleCanvas()
+      if (this.updateUi) {
+        this.postUpdateColorCircleCanvas()
+      }
     }
   }
 
@@ -218,7 +294,81 @@ class UI {
     }
     if (doSet) {
       this.markerRadiusField = value
-      this.postUpdateColorCircleCanvas()
+      if (this.updateUi) {
+        this.postUpdateColorCircleCanvas()
+      }
+    }
+  }
+
+  /**
+   * color circle user interface
+   */
+  get colorCircleUi() {
+    let result = undefined
+    if (typeof this.rootElement !== 'undefined') {
+      result = this.rootElement.getElementsByClassName(
+        this.classMapping.colorCircleCanvas)[0]
+    }
+    return result
+  }
+
+  /**
+   * marker color
+   */
+  get markColor() {
+    let result = undefined
+    const colorCircle = this.colorCircleUi 
+    if (typeof colorCircle !== 'undefined') {
+      const pickerLoc = this.pickerLocation
+      if (typeof pickerLoc !== 'undefined') {
+        result = this.convertPickerLocToRgb(pickerLoc)
+      }
+    }
+    return result
+  }
+
+  /**
+   * set mark color
+   */
+  set markColor(value) {
+    const thisValue = this.markColor
+    let doSet = false
+    if (typeof thisValue !== 'undefined') {
+      if (typeof value !== 'undefined') {
+        if (thisValue.length <= value.length) {
+          for (let i = 0; i < thisValue.length; i++) {
+            doSet = thisValue[i] != value[i]
+            if (doSet) {
+              break
+            }
+          }
+        }
+      }
+    }
+    if (doSet) {
+      const pickerLocAndIndex = 
+        this.convertRgbToPickerLocationAndIndex(value)
+      if (typeof pickerLocAndIndex !== 'undefined') {
+        const savedUpdateUi = this.updateUi
+        const savedEvent = this.raiseEvent
+        this.updateUi = false 
+        this.raiseEvent = false
+        this.pickerLocation = pickerLocAndIndex.pickerLocation
+        this.indexValue = pickerLocAndIndex.indexValue
+        this.updateUi = savedUpdateUi
+        this.raiseEvent = savedEvent
+        if (this.updateUi) {
+          setTimeout(function() { 
+            this.syncValueUiWithValue()
+          }.bind(this))
+          this.postUpdateColorCircleCanvas()
+        }
+        if (this.raiseEvent) {
+          setTimeout(function() {
+            this.notify('pickerLocation')
+          }.bind(this))
+        }
+      }
     }
   }
 
@@ -229,6 +379,9 @@ class UI {
     classMapping = UI.defaultClassNameMapping,
     indexValue = 1.0,
     colorType = 'value') {
+    this.updateUi = false 
+    this.raiseEvent = false
+    this.syncFieldWithUi = false
     this.template = template
     this.classMapping = classMapping
     this.indexValue = indexValue
@@ -240,6 +393,11 @@ class UI {
     }
     this.pickerMarker = UI.defaultPickerMarker 
     this.markerRadius = 2
+
+    this.listeners = { }
+    this.updateUi = true 
+    this.raiseEvent = true
+    this.syncFieldWithUi = true
   }
 
   /**
@@ -252,10 +410,11 @@ class UI {
       rootElement.innerHTML = newContents
     }
 
-    this.bindButtons(rootElement)
+    this.bindValue(rootElement)
     this.bindColorCircle(rootElement)
     this.rootElement = rootElement
     this.postUpdateColorCircleCanvas()
+    setTimeout(function() { this.syncValueUiWithValue() }.bind(this))
   }
 
   /**
@@ -265,7 +424,7 @@ class UI {
     const rootElement = this.rootElement
     if (typeof rootElement !== 'undefined') {
       this.unbindColorCircle(rootElement)
-      this.unbindButtons(rootElement)
+      this.unbindValue(rootElement)
       if (typeof this.oldContents !== 'undefined') {
         rootElement.innnerHtml = this.oldContents
       }
@@ -274,35 +433,86 @@ class UI {
     }
   }
 
+
+  /**
+   * add event listener
+   */
+  addEventListener(type, listener) {
+    if (typeof this.listeners !== 'undefined') {
+      let listeners = this.listeners[type]
+      if (typeof listeners === 'undefined') {
+        listeners = [];
+        this.listeners[type] = listeners;
+      }
+      listeners.push(listener)
+    }
+  }
+
+  /**
+   * remove event listener
+   */
+  removeEventListener(type, listener) {
+    if (typeof this.listeners !== 'undefined') {
+      const listeners = this.listeners[type]
+      if (typeof listeners !== 'undefined') {
+        let indexToRemove
+        for (let i = listeners.length - 1; i >= 0; i--) {
+          if (listeners[i] == listener) {
+            indexToRemove = i
+            break
+          }
+        }
+        if (typeof indexToRemove !== 'undefined') {
+          listeners.splice(indexToRemove, 1)
+        }
+      }
+    }
+  }
+
+
+  /**
+   * notify event message to event listener
+   */
+  notify(type) {
+    if (typeof this.listeners !== 'undefined') {
+      const listeners = this.listeners[type]
+      if (listeners !== 'undefined') {
+        listeners.forEach(function (elem) { 
+          elem({ 
+            type, 
+            target: this
+          })
+        }.bind(this))
+      }
+    }
+  }
+
+
+
+
   /**
    * attach callbacks to button
    */
-  bindButtons(rootElement) {
+  bindValue(rootElement) {
     const listenerParams = [
       {
-        setListener: (listener) => { this.incrementHandler = listener },
+        setListener: (listener) => { this.valueHandler = listener },
         listener: function(event) {
-          if ('click' == event.type) {
-            setTimeout(this.handleIndexIncrement.bind(this), 0, event)
+          if ('input' == event.type) {
+            setTimeout(this.handleValue.bind(this), 0, event)
+          } else if ('blur' == event.type) {
+            setTimeout(this.handleValueValidate.bind(this), 0, event)
           }
         }.bind(this),
-        className: this.classMapping.incrementIndex
-      },
-      {
-        setListener: (listener) => { this.decrementHandler = listener },
-        listener: function(event) {
-          if ('click' == event.type) {
-            setTimeout(this.handleIndexDecrement.bind(this), 0, event)
-          }
-        }.bind(this),
-        className: this.classMapping.decrementIndex
+        className: this.classMapping.value
       }
     ]
 
     listenerParams.forEach(param => {
       const elem = rootElement.getElementsByClassName(param.className)[0]; 
       if (typeof elem !== 'undefined') {
-        elem.addEventListener('click', param.listener)
+        elem.addEventListener('input', param.listener)
+        elem.addEventListener('blur', param.listener)
         param.setListener(param.Listener)
       }
     })
@@ -310,24 +520,20 @@ class UI {
   /**
    * attach callbacks to button
    */
-  unbindButtons(rootElement) {
+  unbindValue(rootElement) {
     const listenerParamss = [
       {
-        clearListener: () => { delete this.incrementHandler },
-        listener: this.incrementHandler,
-        className: this.classMapping.incrementIndex
-      },
-      {
-        clearListener: () => { delete this.decrementHandler },
-        listener: this.decrementHandler,
-        className: this.classMapping.decrementIndex
+        clearListener: () => { delete this.valueHandler },
+        listener: this.valueHandler,
+        className: this.classMapping.value
       }
     ]
 
     listenerParams.forEach(param => {
       const elem = rootElement.getElementsByClassName(param.className)[0]; 
       if (typeof elem !== 'undefined') {
-        elem.removeEventListenr('click', param.listener)
+        elem.removeEventListener('click', param.listener)
+        elem.remvoeEventListener('blur', pram.listener)
         param.clearListener()
       }
     })
@@ -375,63 +581,15 @@ class UI {
    * handle event for clicking in color circle canvas
    */
   handleClickInColorCircle(event) {
-  
-    if (this.isInColorCircle(event.target, event.offsetX, event.offsetY)) {
-      const canvas = event.target
-      const pickerLoc = this.calcPickerLocationFromCanvasLocation(canvas,
-        [event.offsetX, event.offsetY]) 
-      if (typeof pickerLoc !== 'undefined') {
-        this.pickerLocation = pickerLoc
-      }
+    const canvas = event.target
+    const pickerLoc = this.calcPickerLocationFromCanvasLocation(canvas,
+      [event.offsetX, event.offsetY]) 
+    if (typeof pickerLoc !== 'undefined') {
+      this.pickerLocation = pickerLoc
     }
   }
 
-  /**
-   * you get true if [x, y] is in color circle region
-   */
-  isInColorCircle(canvas, x, y) {
-    const color = this.readColor(canvas, x, y)
-    const result = typeof color !== 'undefined'
-    return result
-  }
-  /**
-   * read colorData
-   */
-  readColor(canvas, x, y) {
-    const locRadius = this.getColorCircleLocRadius(canvas)
-    const pickingMap = this.pickingMap
-    const imageData = this.imageData
-    let result = undefined 
-    if (typeof locRadius !== 'undefined'
-      && typeof pickingMap !== 'undefined'
-      && typeof imageData !== 'undefined') {
-      let inCircle = locRadius.loc[0] <= x
-      if (inCircle) {
-        inCircle = x <= locRadius.loc[0] + 2 * locRadius.radius 
-      }
-      if (inCircle) {
-        inCircle = locRadius.loc[1] <= y
-      }
-      if (inCircle) {
-        inCircle = y <= locRadius.loc[1] + 2 * locRadius.radius
-      }
-      if (inCircle) {
-        const imageLoc = [x - locRadius.loc[0], y - locRadius.loc[1]]
-        imageLoc[0] = Math.round(imageLoc[0])
-        imageLoc[1] = Math.round(imageLoc[1])
-        const imageIndex = imageLoc[1] * 2 * locRadius.radius + imageLoc[0]
-        inCircle = pickingMap[imageIndex] != 0 
-        if (inCircle) {
-          result = [0, 0, 0, 0]
-          for (let i = 0; i < result.length; i++) {
-            result[i] = imageData.data[imageIndex * 4 + i]
-          }
-        }
-      }
-    }
-    return result
-  }
-  
+ 
   /**
    * color circle location and radius
    */
@@ -478,14 +636,51 @@ class UI {
         ctx.clearRect(0, 0, colorCanvas.width, colorCanvas.height)
         this.updateColorCircle(ctx)
         this.updatePickerMarker(ctx)
-      } else {
-        delete this.imageData
-        delete this.pickingMap
       }
-    } else {
-      delete this.imageData
-      delete this.pickingMap
     }
+  }
+
+  /**
+   * picker location to rgb
+   */
+  convertPickerLocToRgb(pickerLoc) {
+    let result = undefined
+    const indexValue = this.colorIndexValue
+    const vToColorValue = RgbHs.indexValueToColorValueFunctions[indexValue.type]
+    result = RgbHs.hueChromaToRgb(
+      pickerLoc.radian, 
+      pickerLoc.radius, indexValue.value,
+      vToColorValue)   
+    if (typeof result !== 'undefined') {
+      for (let i = 0; i < result.length; i++) {
+        result[i] = Math.min(Math.max(parseInt(result[i] * 0xff), 0), 0xff)
+      }
+    }
+    return result
+  }
+
+  /**
+   * convert rgb to marker position and index
+   */
+  convertRgbToPickerLocationAndIndex(rgb255) {
+    let result = undefined
+    if (this.colorType == 'value') {
+      let rgb = [0, 0, 0]
+      for (let i = 0; i < rgb.length; i++) {
+        rgb[i] = parseFloat(rgb255[i]) / 0xff
+      }
+      const hueChroma = RgbHs.calcHueChroma(rgb) 
+      const indexValue = rgb[hueChroma.chroma.maxIndex]
+      const pickerLocation = {
+        radius: hueChroma.chroma.value / indexValue,
+        radian: (hueChroma.hue * Math.PI) / 180
+      }
+      result = {
+        pickerLocation,
+        indexValue 
+      }
+    }
+    return result
   }
 
   /**
@@ -498,12 +693,10 @@ class UI {
       locRadius.loc[0], locRadius.loc[1],
       locRadius.radius * 2, locRadius.radius * 2)
       
-    const pickingMap = new Int8Array(Math.pow(locRadius.radius * 2, 2))
-   
-    for (let rIndex = 0; rIndex < locRadius.radius * 2; rIndex++) {
-      for (let cIndex = 0; cIndex < locRadius.radius * 2; cIndex++) {
+    for (let rIndex = 0; rIndex <= locRadius.radius * 2; rIndex++) {
+      for (let cIndex = 0; cIndex <= locRadius.radius * 2; cIndex++) {
         const x = cIndex - locRadius.radius
-        const y = locRadius.radius - rIndex - 1
+        const y = locRadius.radius - rIndex
         const rgb = RgbHs.xyrvToRgb(x, y, locRadius.radius, 
           indexValue.value, 
           RgbHs.indexValueToColorValueFunctions[indexValue.type]);
@@ -515,13 +708,10 @@ class UI {
           }
           imageData.data[4 * (rIndex * 2 * locRadius.radius + cIndex) + 3] = 
             0xff
-          pickingMap[rIndex * 2 * locRadius.radius + cIndex] = 1
         }
       }
     }
     ctx.putImageData(imageData, locRadius.loc[0], locRadius.loc[1])
-    this.pickingMap = pickingMap
-    this.imageData = imageData
   } 
 
   /**
@@ -534,8 +724,6 @@ class UI {
     const colorCircleState = RgbHs.createColorCircleProgress(
       locRadius.radius, indexValue, undefined);
       
-    const pickingMap = new Int8Array(ctx.canvas.width * ctx.canvas.height)
-
     const colorCircleProgress = function(state, lastProcessedIndex) {
       const imageData = ctx.getImageData(
         locRadius.loc[0], locRadius.loc[1], state.col, state.row)
@@ -553,17 +741,11 @@ class UI {
               (rowIndex * state.col + colIndex) * 4 + i] = rgb[i];
           }
           imageData.data[(rowIndex * state.col + colIndex) * 4 + 3] = 255
-          pickingMap[rowIndex * ctx.canvas.width + colIndex] = 1
         }
         ctx.putImageData(imageData, locRadius.loc[0], locRadius.loc[1])
       }
 
     }
-    this.imageData = ctx.getImageData(
-      locRadius.loc[0], locRadius.loc[1],
-      ctx.canvas.width, ctx.canvas.height)
- 
-    this.pickingMap = pickingMap
     const promise = colorCircleState.start(colorCircleProgress)
 
   }
@@ -609,7 +791,7 @@ class UI {
       cartesian[0] = pickerLocation.radius * locRadius.radius
       cartesian[1] = cartesian[0]
       cartesian[0] *= Math.cos(pickerLocation.radian)
-      cartesian[1] *= Math.sin(pickerLocation.radian)
+      cartesian[1] *= -Math.sin(pickerLocation.radian)
       cartesian[0] += center[0]
       cartesian[1] += center[1]
       result = cartesian
@@ -631,7 +813,7 @@ class UI {
 
       const pickerLoc = [0, 0]
       pickerLoc[0] = cartesian[0] - center[0]
-      pickerLoc[1] = cartesian[1] - center[1]
+      pickerLoc[1] = -(cartesian[1] - center[1])
       let radian
       if (pickerLoc[0] != 0 || pickerLoc[0] != -0.0) {
         const tan = parseFloat(pickerLoc[1]) / pickerLoc[0]
@@ -659,25 +841,65 @@ class UI {
       let radius = Math.sqrt(
         Math.pow(pickerLoc[0], 2) + Math.pow(pickerLoc[1], 2))
       radius /= locRadius.radius
-      result = {
-        radius,
-        radian
+      if (radius <= 1) {
+        result = {
+          radius,
+          radian
+        }
       }
     }
     return result
   }
 
   /**
+   * varidate value input
+   */
+  handleValueValidate() {
+    let value = this.indexValueUi
+    if (typeof value !== 'undefined') {
+      const oldValue = value
+      if (value < 0) {
+        value = 0
+      }
+      if (value > 0xff) {
+        value = 0xff
+      }
+      if (oldValue != value) {
+        this.indexValueUi = value
+      }
+    }
+  }
+
+  /**
    * handle index increment event
    */
-  handleIndexIncrement(event) {
-    this.indexValue += 0.1     
+  handleValue(event) {
+    this.syncValueWithUi() 
   }
+
+
   /**
-   * handle index decrement event
+   * synchronize index value with value user interface.
    */
-  handleIndexDecrement(event) {
-    this.indexValue -= 0.1
+  syncValueWithUi() {
+    const savedUpdateUi = this.updateUi
+    this.updateUi = false
+    this.indexValueInt = this.indexValueUi
+    this.updateUi = savedUpdateUi
+    if (savedUpdateUi) {
+      this.postUpdateColorCircleCanvas()
+    }
+  }
+
+  /**
+   * synchronize value on user interface with value field
+   */
+  syncValueUiWithValue() {
+    const savedSync = this.syncFieldWithUi
+    this.syncFieldWithUi = false
+    this.indexValueUi = this.indexValueInt
+    this.syncFieldWithUi = savedSync
+
   }
 }
 

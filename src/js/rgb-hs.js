@@ -82,7 +82,7 @@ class RgbHs {
       value: rgb[maxIndex] - rgb[minIndex],
       maxIndex: maxIndex,
       minIndex: minIndex
-    };
+    }
   }
 
   /**
@@ -103,10 +103,10 @@ class RgbHs {
     let result;
     if (chroma.value != 0) {
       let tempValue;
-      tempValue = rgb[(maxIndex + 1) % 3]
-        - rgb[(maxIndex + 2) % 3];
-      tempValue /= rgb[maxIndex];
-      result = RgbHs.hueOperator[maxIndex](tempValue);
+      tempValue = rgb[(chroma.maxIndex + 1) % 3]
+        - rgb[(chroma.maxIndex + 2) % 3];
+      tempValue /= rgb[chroma.maxIndex];
+      result = RgbHs.hueOperator[chroma.maxIndex](tempValue);
       result *= 60;
     } else {
       result = 0;
@@ -116,6 +116,18 @@ class RgbHs {
 
   static get cos30() {
     return Math.pow(3, 0.5) / 2;
+  }
+
+  /**
+   * calculate hue and chroma
+   */
+  static calcHueChroma(rgb) {
+    const chroma = RgbHs.calcChroma(rgb)
+    const hue = RgbHs.calcHue(rgb, chroma)
+    return {
+      chroma,
+      hue
+    }
   }
    
   static calcHueChroma2(rgb) {
@@ -287,27 +299,35 @@ class RgbHs {
     if (xyRadius <= 1) {
       let chroma;
       chroma = xyRadius / RgbHs.calcChromaRatioFromHue(hue);
-      const hue6 = hue / (Math.PI / 3);
-      const secValue = chroma * (1 - Math.abs((hue6 % 2) - 1));
-      result = [0, 0, 0];
-      if (chroma > 0) {
-        const hue6Int = Math.floor(hue6);
-        const firstValueIndex = Math.floor(((hue6Int + 1) % 6) / 2);
-        const secValueIndex = (6 - hue6Int + 1) % 3;
-         
-        result[firstValueIndex] = chroma;
-        result[secValueIndex] = secValue;
-      }
-      const colorValue = vToColorValue(v, chroma, result);
-      for (let i = 0; i < 3; i++) {
-        result[i] += colorValue;
-        result[i] = Math.max(result[i], 0);
-        result[i] = Math.min(result[i], 1);
-       }
+      result = RgbHs.hueChromaToRgb(hue, chroma, v, vToColorValue);
     } else {
       result = undefined;
     }
     return result;
+  }
+
+  /**
+   * calc rgb from hue and chroma
+   */
+  static hueChromaToRgb(hue, chroma, v, vToColorValue) {
+    const hue6 = hue / (Math.PI / 3);
+
+    const result = [0, 0, 0];
+    if (chroma > 0) {
+      const hue6Int = Math.floor(hue6);
+      const firstValueIndex = Math.floor(((hue6Int + 1) % 6) / 2);
+      const secValueIndex = (6 - hue6Int + 1) % 3;
+      const secValue = chroma * (1 - Math.abs((hue6 % 2) - 1));         
+      result[firstValueIndex] = chroma;
+      result[secValueIndex] = secValue;
+    }
+    const colorValue = vToColorValue(v, chroma, result);
+    for (let i = 0; i < 3; i++) {
+      result[i] += colorValue;
+      result[i] = Math.max(result[i], 0);
+      result[i] = Math.min(result[i], 1);
+    }
+    return result
   }
 
   static vToColorValue(v, chroma, rgbTempValue) {
@@ -339,6 +359,7 @@ class RgbHs {
        luma: RgbHs.lumaY601ToColorValue
     }
   }
+
 
   static createColorCircle(radius, indexValue, notCircleValue) {
     const rgbValues = [];
