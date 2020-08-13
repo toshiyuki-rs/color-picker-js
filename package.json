@@ -1,8 +1,12 @@
 {
-  "name": "color-picker",
+  "name": "@oc-soft/color-picker",
   "version": "1.0.0",
   "description": "Provide user interface to select color",
-  "main": "js/ui.js",
+  "type": "module",
+  "exports": {
+    ".": "src/js/ui.js",
+    "./rgb-hs": "src/js/rgb-hs.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack"
