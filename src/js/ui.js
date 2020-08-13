@@ -856,7 +856,9 @@ class UI {
    */
   handleValueValidate() {
     let value = this.indexValueUi
-    if (typeof value !== 'undefined') {
+    if (typeof value === 'undefined') {
+        this.indexValueUi = this.indexValueInt
+    } else {
       const oldValue = value
       if (value < 0) {
         value = 0
