@@ -7,6 +7,7 @@ class UI {
 
   /**
    * defatult template
+   * @return {string}
    */
   static get defaultTemplate() {
     return `<div class="oc-color-circle-container">
@@ -20,6 +21,7 @@ class UI {
 
   /**
    * default template mapping
+   * @return {{value: string, colorCircleCanvas: string}}
    */
   static get defaultClassNameMapping() {
     return {

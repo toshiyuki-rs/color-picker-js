@@ -1,10 +1,16 @@
+/**
+ * @namespace oc.color
+ */
 
 /**
  * rgb hsv management
  */
 class RgbHs {
+
   /**
    * convert from rgb to hex
+   * @param {number[]} rgb
+   * @return {number}
    */
   static rgbToHex(rgb) {
     let result;
@@ -17,6 +23,8 @@ class RgbHs {
 
   /**
    * convert hex to rgb
+   * @param {number} rgb
+   * @return {number[]}
    */
   static hexToRgb(rgb) {
     let intMask;
@@ -32,6 +40,8 @@ class RgbHs {
 
   /**
    * convert from rgb to array
+   * @param {{red: number, green: number, blue: number}} rgb
+   * @return {number[]}
    */
   static toRgbArray(rgb) {
     return [rgb.red, rgb.green, rgb.blue];
@@ -39,6 +49,8 @@ class RgbHs {
 
   /**
    * find index 
+   * @param {number[]} rgb
+   * @param {RgbHs~comparator} comparator
    */
   static findIndex(rgb, comparator) {
     let result;
@@ -54,6 +66,7 @@ class RgbHs {
 
   /**
    * find max index
+   * @param {number[]} rgb
    */
   static findMaxIndex(rgb) {
     return RgbHs.findIndex(rgb, 
@@ -64,6 +77,7 @@ class RgbHs {
 
   /**
    * find minimum index
+   * @param {number[]} rgb
    */
   static findMinIndex(rgb) {
     return RgbHs.findIndex(rgb, 
@@ -74,6 +88,8 @@ class RgbHs {
 
   /**
    * calc chroma
+   * @param {number[]} rgb
+   * @return {RgbHs~Chroma}
    */
   static calcChroma(rgb) {
     const maxIndex = RgbHs.findMaxIndex(rgb);
@@ -87,6 +103,7 @@ class RgbHs {
 
   /**
    * heu operator
+   * @return {RgbHs~hueOperatorProc[]} 
    */
   static get hueOperator() {
     return [
@@ -97,7 +114,10 @@ class RgbHs {
   }
 
   /**
-   * calc hue
+   * calculate hue
+   * @param {number[]} rgb
+   * @param {{maxIndex: number}} chroma
+   * @return {number} hue 
    */
   static calcHue(rgb, chroma) {
     let result;
@@ -120,6 +140,8 @@ class RgbHs {
 
   /**
    * calculate hue and chroma
+   * @param {number[]} rgb
+   * @return {{chroma: RgbHs~Chroma, hue: number}}
    */
   static calcHueChroma(rgb) {
     const chroma = RgbHs.calcChroma(rgb)
@@ -130,6 +152,11 @@ class RgbHs {
     }
   }
    
+  /**
+   * calculate hue and chroma with hexagonal mode
+   * @param {number[]} rgb
+   * @return {{alpha: number, beta: number, hue2: number, chroma2: number}}
+   */
   static calcHueChroma2(rgb) {
     const alpha = (2 * rgb[0] - rgb[1] - rgb[2]) / 2;
     const beta = RgbHs.cos30 * (rgb[1] - rgb[2]);
@@ -143,6 +170,12 @@ class RgbHs {
     };
   }
 
+  /**
+   * calculate luma
+   * @param {number[]} rgb
+   * @param {number[]} coefficients
+   * @return {number} luma value
+   */
   static luma(rgb, coefficients) {
     let result;
     result = rgb[0] * coefficients[0];
@@ -152,26 +185,56 @@ class RgbHs {
     return result;
   }
    
+  /**
+   * calculate luma y 709
+   * @param {number[]} rgb
+   * @return {number} luma value
+   */
   static lumaY709(rgb) {
     return RgbHs.luma(rgb, [.21, .72, .07]);  
   }
 
+  /**
+   * calculate luma y 601
+   * @param {number[]} rgb
+   * @return {number} luma value
+   */
   static lumaY601(rgb) {
     return RgbHs.luma(rgb, [.3, .59, .11]);
   }
 
+  /**
+   * get maximum value of rgb component
+   * @param {number[]} rgb
+   * @return {number}
+   */
   static rgbMaxValue(rgb) {
     return rgb[RgbHs.findMaxIndex(rgb)];
   }
 
+  /**
+   * get minimum value of rgb component
+   * @param {number[]} rgb
+   * @return {number}
+   */
   static rgbMinValue(rgb) {
     return rgb[RgbHs.findMinIndex(rgb)];
   }
 
+  /**
+   * calculate average between max and min value of rgb component
+   * @param {number[]} rgb
+   * @return {number}
+   */
   static rgbMinMaxAverage(rgb) {
     return (rgb[RgbHs.findMaxIndex(rgb)] + rgb[RgbHs.findMinIndex(rgb)]) / 2;
   }
 
+  /**
+   * calculate average of rgb components
+   * @param {number[]} rgb
+   * @return {number}
+   */
   static rgbAverage(rgb) {
     let result;
     let index;
@@ -181,7 +244,10 @@ class RgbHs {
     }
     return result / 3;
   }
-
+  /**
+   * lightness procedures
+   * {RgbHs~LightnessProcs}
+   */
   static get lightness() {
     return {
       average: RgbHs.rgbAverage,
@@ -196,6 +262,10 @@ class RgbHs {
     };
   }
 
+  /**
+   * saturation procedures
+   * @return {Rgb~SaturationProcs)
+   */
   static get saturation() {
     return {
       i: function(rgb, chroma, i) {
@@ -228,6 +298,11 @@ class RgbHs {
     }
   }
 
+  /**
+   * convert rgb [0, 255] array to rgb [0, 1] array
+   * @param {number[]} rgb
+   * @return {number[]} rgb
+   */
   static rgb255ToRgb1(rgb) {
     return {
       red: rgb.red / 255.0,
@@ -236,6 +311,11 @@ class RgbHs {
     };
   }
 
+  /**
+   * convert rgb to hexagnal hsv
+   * @param {{red: number, green: number, blue: number}}
+   * @return {{hue2: number, chroma2: number, v: number, saturation: number}}
+   */
   static rgbToHsv2(rgb) {
     rgb = RgbHs.toRgbArray(rgb);
     let hueChroma;
@@ -250,7 +330,11 @@ class RgbHs {
     };
     return result;
   }
-
+  /**
+   * convert rgb to hexagnal hsl
+   * @param {{red: number, green: number, blue: number}}
+   * @return {{hue2: number, chroma2: number, l: number, saturation: number}}
+   */
   static rgbToHsl2(rgb) {
     rgb = toRgbArray(rgb);
     const hueChroma = RgbHs.calcHueChroma2(rgb);
@@ -265,8 +349,11 @@ class RgbHs {
     return result;
   }
 
-
-
+  /**
+   * calculate chroma from hue
+   * @param {number} hue
+   * @param {number} chroma
+   */
   static calcChromaRatioFromHue(hue) {
     const root3 = Math.sqrt(3);
     let angle;
@@ -282,6 +369,15 @@ class RgbHs {
     return result;
   }
 
+  /**
+   * convert [x, y, r, v] to rgb.
+   *
+   * @param {number} x - x coordinate
+   * @param {number} y - y coordinage
+   * @param {number} r - radius
+   * @param {number} v - value for hsv
+   * @param {RgbHs~vToColorProc} vToColorValue
+   */
   static xyrvToRgb(x, y, r, v, vToColorValue) {
     let theta;
     theta = Math.atan2(y, x);
@@ -308,6 +404,10 @@ class RgbHs {
 
   /**
    * calc rgb from hue and chroma
+   * @param {number} hue
+   * @param {number} chroma
+   * @param {number} v - value for hsv
+   * @param {RgbHs~vToColorProc} vToColorValue
    */
   static hueChromaToRgb(hue, chroma, v, vToColorValue) {
     const hue6 = hue / (Math.PI / 3);
@@ -330,26 +430,65 @@ class RgbHs {
     return result
   }
 
+  /**
+   * value to color value
+   * @param {number} v
+   * @param {number} chroma
+   * @param {number[]} rgbTempValue
+   * @return {number}
+   */
   static vToColorValue(v, chroma, rgbTempValue) {
     return v - chroma;
-  };
+  }
 
+  /**
+   * lightness to color value
+   * @param {number} l
+   * @param {number} chroma
+   * @param {number[]} rgbTempValue
+   * @return {number}
+   */
   static lToColorValue(l, chroma, rgbTempValue) {
     return l - chroma / 2;  
   }
 
+  /**
+   * luma Y 709 to color value
+   * @param {number} y709
+   * @param {number} chroma
+   * @param {number[]} rgbTempValue
+   * @return {number}
+   */
   static lumaY709ToColorValue(y709, chroma, rgbTempValue) {
     return y709 - RgbHs.lumaY709(rgbTempValue);
   }
 
+  /**
+   * luma Y 601 to color value
+   * @param {number} y601
+   * @param {number} chroma
+   * @param {number[]} rgbTempValue
+   * @return {number}
+   */
   static lumaY601ToColorValue(y601, chroma, rgbTempValue) {
     return y601 - RgbHs.lumaY601(rgbTempValue);
   }
 
+  /**
+   * get true if [x, y] coordinate in circle which has radius
+   * @param {number} x
+   * @param {number} y
+   * @param {number} radius
+   * @return {number}
+   */
   static isInCircle(x, y, radius) {
     return Math.sqrt(x * x, y * y) < radius;
   }
 
+  /**
+   * conversion procedures from index value to color value
+   * @return {RgbHs~ValueToColorProcedures}
+   */
   static get indexValueToColorValueFunctions() {
     return {
        value: RgbHs.vToColorValue,
@@ -360,7 +499,13 @@ class RgbHs {
     }
   }
 
-
+  /**
+   * create color circle
+   * @param {number} radius
+   * @param {number} indexValue
+   * @param {Object | undefined} notCircleValue
+   * @return {{rgb: number[], row: number, col: number}}
+   */
   static createColorCircle(radius, indexValue, notCircleValue) {
     const rgbValues = [];
     for (let rowIndex = 0; rowIndex < 2 * radius; rowIndex++) {
@@ -389,6 +534,13 @@ class RgbHs {
     return result;
   }
 
+  /**
+   * create color circle region with progress callback
+   * @param {number} radius
+   * @param {number} indexValue
+   * @param {Object|undefined} notCircleValue
+   * @return {{start:{RgbHs~startToCreateColorCircleProc}}}
+   */
   static createColorCircleProgress(radius, indexValue, notCircleValue) {
     let diameter;
     diameter = 2 * radius;
@@ -482,6 +634,108 @@ class RgbHs {
     return result;
   } 
 }
+
+/**
+ * rgb comparator
+ * @callback RgbHs~comparator
+ * @param {number} a
+ * @param {number} b
+ * @return {number}
+ */
+
+/**
+ * hue operator procedure
+ * @callback RgbHs~hueOperatorProc
+ * @param {number} value
+ */
+
+/**
+ * procedure to calculate lightness
+ * @callback RgbHs~lightnessProc
+ * @praram {number[]} rgb
+ * @return {number}
+ */
+
+/**
+ * procedure to calculate saturation
+ * @calback RgbHs~saturationProc
+ * @param {number[]} rgb
+ * @param {number} chroma
+ * @param {number} arg0
+ */
+
+/**
+ * the procedure to calculate rgb bias value from value and chroma
+ * @callback RgbHs~vToColorProc
+ * @param {number} v
+ * @param {number} chroma
+ * @param {number[]} rgb
+ * @return {number} bias - the bias to be added 
+ */
+
+/**
+ * color circle progress procedure
+ * @callback RgbHs~colorCircleProgressProc
+ * @param {{rgb: number[], row: number, col: number, stepCount: number,
+ * col, calcRowColumnIndex: {RgbHs~indexToRowColumn}}} colorCircleState
+ * @param {number[]} runningState
+ */
+
+/**
+ * the start procedrue to create color circle
+ * @callback RgbHs~startToCreateColorCircleProc
+ * @param {RgbHs~colorCircleProgressProc} progress} progress} progress} progress
+ * @return {Promise}
+ */
+
+
+/**
+ * calculate row and column index from sequencial index
+ * @callback RgbHs~indexToRowColumn
+ * @param {number} index
+ */
+
+/**
+ * chroma representation
+ * @typedef {Object} RgbHs~Chroma
+ * @property {number} value
+ * @property {number} maxIndex
+ * @property {number} minIndex
+ */
+
+/**
+ * lightness procedures
+ * @typedef {Object} RgbHs~LightnessProcs
+ * @property {RgbHs~lightnessProc} average
+ * @property {RgbHs~lightnessProc} i 
+ * @property {RgbHs~lightnessProc} max 
+ * @property {RgbHs~lightnessProc} v
+ * @property {RgbHs~lightnessProc} minMaxAverage
+ * @property {RgbHs~lightnessProc} l
+ * @property {RgbHs~lightnessProc} lumaY709
+ * @property {RgbHs~lightnessProc} lumaY601
+ * @property {RgbHs~lightnessProc} luma
+ */
+
+/**
+ * saturation procedures
+ * @typedef {Object} RgbHs~SaturatioProcs
+ * @property {RgsHs~SaturationProc) i
+ * @property {RgbHs~SaturationProc) v
+ * @property {RgbHs~SaturationProc} l
+ */
+
+/**
+ * convert index value to color value offset procedures
+ * @typedef {Object} RgbHs~ValueToColorProcedures
+ * @property {RgbHs~vToColorProc} value
+ * @property {RgbHs~vToColorProc} lightness
+ * @property {RgbHs~vToColorProc} lumaY601
+ * @property {RgbHs~vToColorProc} lumaY709
+ * @property {RgbHs~vToColorProc} luma
+ */
+
+
 
 export { RgbHs as default };
 // vi: se ts=2 sw=2 et:
