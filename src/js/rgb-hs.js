@@ -676,15 +676,14 @@ class RgbHs {
 /**
  * color circle progress procedure
  * @callback RgbHs~colorCircleProgressProc
- * @param {{rgb: number[], row: number, col: number, stepCount: number,
- * col, calcRowColumnIndex: {RgbHs~indexToRowColumn}}} colorCircleState
+ * @param {{rgb: number[], row: number, col: number, stepCount: number, calcRowColumnIndex: {RgbHs~indexToRowColumn}}} colorCircleState
  * @param {number[]} runningState
  */
 
 /**
  * the start procedrue to create color circle
  * @callback RgbHs~startToCreateColorCircleProc
- * @param {RgbHs~colorCircleProgressProc} progress} progress} progress} progress
+ * @param {RgbHs~colorCircleProgressProc} progress progress
  * @return {Promise}
  */
 
