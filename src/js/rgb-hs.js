@@ -50,7 +50,7 @@ class RgbHs {
   /**
    * find index 
    * @param {number[]} rgb
-   * @param {RgbHs~comparator} comparator
+   * @param {(a: number, b: number) => number} comparator
    */
   static findIndex(rgb, comparator) {
     let result;
@@ -87,9 +87,9 @@ class RgbHs {
   }
 
   /**
-   * calc chroma
+   * calculate chroma
    * @param {number[]} rgb
-   * @return {RgbHs~Chroma}
+   * @return {{value: number, maxIndex: number,  minIndex: number}}
    */
   static calcChroma(rgb) {
     const maxIndex = RgbHs.findMaxIndex(rgb);
@@ -103,7 +103,7 @@ class RgbHs {
 
   /**
    * heu operator
-   * @return {RgbHs~hueOperatorProc[]} 
+   * @return {((v: number) => number)[]} 
    */
   static get hueOperator() {
     return [
@@ -134,6 +134,10 @@ class RgbHs {
     return result;
   }
 
+  /**
+   * calculate cos 30 degree
+   * @return {number}
+   */
   static get cos30() {
     return Math.pow(3, 0.5) / 2;
   }
@@ -141,7 +145,8 @@ class RgbHs {
   /**
    * calculate hue and chroma
    * @param {number[]} rgb
-   * @return {{chroma: RgbHs~Chroma, hue: number}}
+   * @return {{chroma: {value: number, maxIndex: number, minIndex: number}, 
+   *           hue: number}}
    */
   static calcHueChroma(rgb) {
     const chroma = RgbHs.calcChroma(rgb)
@@ -246,7 +251,16 @@ class RgbHs {
   }
   /**
    * lightness procedures
-   * {RgbHs~LightnessProcs}
+   * @return {{ average: (rgb: number[]) => number,
+   *           i: (rgb: number[]) => number,
+   *           max: (rgb: number[]) => number,
+   *           v: (rgb: number[]) => number,
+   *           minMaxAverage: (rgb: number[]) => number,
+   *           l: (rgb: number[]) => number,
+   *           lumaY709: (rgb: number[]) => number,
+   *           lumaY601: (rgb: number[]) => number,
+   *           luma: (rgb: number[]) => number
+   *          }}
    */
   static get lightness() {
     return {
@@ -264,7 +278,11 @@ class RgbHs {
 
   /**
    * saturation procedures
-   * @return {Rgb~SaturationProcs)
+   * @return {{
+   *            i: (rgb: number[], chroma: number, i: number) => number,
+   *            v: (rgb: number[], chroma: number, v: number) => number,
+   *            l: (rgb: number[], chroma: number, l: number) => number
+   *          }}
    */
   static get saturation() {
     return {
@@ -376,7 +394,7 @@ class RgbHs {
    * @param {number} y - y coordinage
    * @param {number} r - radius
    * @param {number} v - value for hsv
-   * @param {RgbHs~vToColorProc} vToColorValue
+   * @param {(v: number, chroma: number, rgb: number[]) => number} vToColorValue
    */
   static xyrvToRgb(x, y, r, v, vToColorValue) {
     let theta;
@@ -407,7 +425,7 @@ class RgbHs {
    * @param {number} hue
    * @param {number} chroma
    * @param {number} v - value for hsv
-   * @param {RgbHs~vToColorProc} vToColorValue
+   * @param {(v: number, chroma: number, rgb: number[]) => number} vToColorValue
    */
   static hueChromaToRgb(hue, chroma, v, vToColorValue) {
     const hue6 = hue / (Math.PI / 3);
@@ -487,7 +505,13 @@ class RgbHs {
 
   /**
    * conversion procedures from index value to color value
-   * @return {RgbHs~ValueToColorProcedures}
+   * @return {{
+   *            value: (v: number, chroma: number, rgb: number[]) => number,
+   *            lightness: (v: number, chroma: number, rgb: number[]) => number,
+   *            lumaY601: (v: number, chroma: number, rgb: number[]) => number,
+   *            lumaY709: (v: number, chroma: number, rgb: number[]) => number,
+   *            luma: (v: number, chroma: number, rgb: number[]) => number
+   *         }}
    */
   static get indexValueToColorValueFunctions() {
     return {
@@ -539,7 +563,14 @@ class RgbHs {
    * @param {number} radius
    * @param {number} indexValue
    * @param {Object|undefined} notCircleValue
-   * @return {{start:{RgbHs~startToCreateColorCircleProc}}}
+   * @return {{
+   *            start:(progress:(state: {
+   *                    rgb: number[],
+   *                    row: number,
+   *                    col: number,
+   *                    calcRowColumnIndex: (index: number) => number},
+   *                    curRange: number[])=>void) => Promise
+   *         }}
    */
   static createColorCircleProgress(radius, indexValue, notCircleValue) {
     let diameter;
@@ -635,104 +666,6 @@ class RgbHs {
   } 
 }
 
-/**
- * rgb comparator
- * @callback RgbHs~comparator
- * @param {number} a
- * @param {number} b
- * @return {number}
- */
-
-/**
- * hue operator procedure
- * @callback RgbHs~hueOperatorProc
- * @param {number} value
- */
-
-/**
- * procedure to calculate lightness
- * @callback RgbHs~lightnessProc
- * @praram {number[]} rgb
- * @return {number}
- */
-
-/**
- * procedure to calculate saturation
- * @calback RgbHs~saturationProc
- * @param {number[]} rgb
- * @param {number} chroma
- * @param {number} arg0
- */
-
-/**
- * the procedure to calculate rgb bias value from value and chroma
- * @callback RgbHs~vToColorProc
- * @param {number} v
- * @param {number} chroma
- * @param {number[]} rgb
- * @return {number} bias - the bias to be added 
- */
-
-/**
- * color circle progress procedure
- * @callback RgbHs~colorCircleProgressProc
- * @param {{rgb: number[], row: number, col: number, stepCount: number, calcRowColumnIndex: {RgbHs~indexToRowColumn}}} colorCircleState
- * @param {number[]} runningState
- */
-
-/**
- * the start procedrue to create color circle
- * @callback RgbHs~startToCreateColorCircleProc
- * @param {RgbHs~colorCircleProgressProc} progress progress
- * @return {Promise}
- */
-
-
-/**
- * calculate row and column index from sequencial index
- * @callback RgbHs~indexToRowColumn
- * @param {number} index
- */
-
-/**
- * chroma representation
- * @typedef {Object} RgbHs~Chroma
- * @property {number} value
- * @property {number} maxIndex
- * @property {number} minIndex
- */
-
-/**
- * lightness procedures
- * @typedef {Object} RgbHs~LightnessProcs
- * @property {RgbHs~lightnessProc} average
- * @property {RgbHs~lightnessProc} i 
- * @property {RgbHs~lightnessProc} max 
- * @property {RgbHs~lightnessProc} v
- * @property {RgbHs~lightnessProc} minMaxAverage
- * @property {RgbHs~lightnessProc} l
- * @property {RgbHs~lightnessProc} lumaY709
- * @property {RgbHs~lightnessProc} lumaY601
- * @property {RgbHs~lightnessProc} luma
- */
-
-/**
- * saturation procedures
- * @typedef {Object} RgbHs~SaturatioProcs
- * @property {RgsHs~SaturationProc) i
- * @property {RgbHs~SaturationProc) v
- * @property {RgbHs~SaturationProc} l
- */
-
-/**
- * convert index value to color value offset procedures
- * @typedef {Object} RgbHs~ValueToColorProcedures
- * @property {RgbHs~vToColorProc} value
- * @property {RgbHs~vToColorProc} lightness
- * @property {RgbHs~vToColorProc} lumaY601
- * @property {RgbHs~vToColorProc} lumaY709
- * @property {RgbHs~vToColorProc} luma
- */
 
 
 
