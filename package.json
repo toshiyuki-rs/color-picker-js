@@ -1,6 +1,6 @@
 {
   "name": "@oc-soft/color-picker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Provide user interface to select color",
   "type": "module",
   "exports": {

@@ -1,6 +1,10 @@
 import RgbHs from './rgb-hs.js'
 
 /**
+ * @namespace oc.color
+ */
+
+/**
  * user interface
  */
 class UI {
@@ -486,7 +490,7 @@ class UI {
    * @param {HTMLElement} rootElement
    */
   bind(rootElement) {
-    if (typeof this.template !== 'undefined') {
+    if (this.template) {
       /** @ignore */
       this.oldContents = rootElement.innerHTML
       const newContents = this.template

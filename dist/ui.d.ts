@@ -1,5 +1,8 @@
 export { UI as default };
 /**
+ * @namespace oc.color
+ */
+/**
  * user interface
  */
 declare class UI {
