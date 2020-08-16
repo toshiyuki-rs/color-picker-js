@@ -13,7 +13,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
+    "build": "webpack --config webpack.config.cjs"
   },
   "keywords": [
     "ui",
@@ -22,7 +22,7 @@
     "picker"
   ],
   "author": "Toshiyuki Ogawa",
-  "license": "ISC", 
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/toshiyuki-rs/color-picker-js/issues"
   },
