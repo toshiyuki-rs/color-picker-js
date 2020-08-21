@@ -1,11 +1,8 @@
-/**
- * @namespace oc.color
- */
 
 /**
  * rgb hsv management
  */
-class RgbHs {
+export class RgbHs {
 
   /**
    * convert from rgb to hex
@@ -165,7 +162,7 @@ class RgbHs {
   static calcHueChroma2(rgb) {
     const alpha = (2 * rgb[0] - rgb[1] - rgb[2]) / 2;
     const beta = RgbHs.cos30 * (rgb[1] - rgb[2]);
-    const hue2 = Math.atan(alpha, beta);
+    const hue2 = Math.atan2(alpha, beta);
     const chroma2 = Math.sqrt(alpha * alpha + beta * beta);
     return {
       alpha: alpha,
@@ -338,13 +335,13 @@ class RgbHs {
     rgb = RgbHs.toRgbArray(rgb);
     let hueChroma;
     hueChroma = RgbHs.calcHueChroma2(rgb);
-    let v = lightness.v(rgb);
+    let v = RgbHs.lightness.v(rgb);
        
     const result = {
       hue2: hueChroma.hue2,
       chroma2: hueChroma.chroma2,
       v: v,
-      satulation: RgbHs.satulation.v(rgb, chroma, v)
+      saturation: RgbHs.saturation.v(rgb, hueChroma.chroma2, v)
     };
     return result;
   }
@@ -354,7 +351,7 @@ class RgbHs {
    * @return {{hue2: number, chroma2: number, l: number, saturation: number}}
    */
   static rgbToHsl2(rgb) {
-    rgb = toRgbArray(rgb);
+    rgb = RgbHs.toRgbArray(rgb);
     const hueChroma = RgbHs.calcHueChroma2(rgb);
     const l = RgbHs.lightness.l(rgb);
        
@@ -362,7 +359,7 @@ class RgbHs {
       hue2: hueChroma.hue2,
       chroma2: hueChroma.chroma2,
       l: l,
-      satulation: RgbHs.satulation.l(rgb, chroma, l)
+      saturation: RgbHs.saturation.l(rgb, hueChroma.chroma2, l)
     };
     return result;
   }
@@ -500,7 +497,7 @@ class RgbHs {
    * @return {number}
    */
   static isInCircle(x, y, radius) {
-    return Math.sqrt(x * x, y * y) < radius;
+    return Math.sqrt(x * x + y * y) < radius;
   }
 
   /**
@@ -543,7 +540,7 @@ class RgbHs {
           indexValue.value, 
           RgbHs.indexValueToColorValueFunctions[indexValue.type]);
         if (typeof rgbValue !== 'undefined') {
-          rowRgbValues[colIndex] = rgbToHex(rgbValue);
+          rowRgbValues[colIndex] = RgbHs.rgbToHex(rgbValue);
         } else {
           rowRgbValues[colIndex] = notCircleValue;
         }
@@ -578,25 +575,27 @@ class RgbHs {
     var totalPixcels;
     totalPixcels = 4 * radius * radius;
     const calcRowColumnIndex = function(index) {
-      const result = {};
-      result.row = Math.floor(index / (2 * radius));
-      result.column = index % (2 * radius);
+      const result = {
+        row: Math.floor(index / (2 * radius)),
+        column: index % (2 * radius)
+      }
       return result;
-    };
+    }
 
     const createColorCircleState = function() {
-      const result = {};
-      result.stepCount = diameter;
-      result.rgb = [];
-      result.row = diameter;
-      result.col = diameter;
-     
-      result.calcRowColumnIndex = calcRowColumnIndex;
-      return result;
-    };
+      const result = {
+        stepCount: diameter,
+        rgb: [],
+        row: diameter,
+        col: diameter,
+        calcRowColumnIndex: calcRowColumnIndex
+      }
+      return result
+    }
     const createColorCircleRunningState = function() {
-      const result = {};
-      result.currentIndex = 0;
+      const result = {
+        currentIndex: 0
+      };
       return result;
     };
     const createColorCircle = function(
@@ -660,14 +659,11 @@ class RgbHs {
       });
       return res;
     };
-    colorCircleState.start = startMethod;
-    const result = colorCircleState;
+    const result = {
+      start: startMethod
+    };
     return result;
   } 
 }
 
-
-
-
-export { RgbHs as default };
 // vi: se ts=2 sw=2 et:

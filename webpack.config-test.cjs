@@ -7,19 +7,20 @@ webpackSetting = {}
 webpackSetting.mode = 'development'
 
 webpackSetting.entry = {
-  test: ['./src/js/color-test.js',
-          './src/less/ui.less']
+  test: ['./src/color-test.js',
+          './src/ui.less']
 }
 
 webpackSetting.plugins =[ 
   new HtmlWebpackPlugin({
     chunks:['test'],
-    template: 'src/js/color-test.ejs'
+    template: 'src/color-test.ejs'
   }),
   new ExtractCss({
   })
 ]
 webpackSetting.devtool = 'source-map' 
+
 webpackSetting.module = {
   rules: [
     {
@@ -40,13 +41,23 @@ webpackSetting.module = {
           loader: 'less-loader'
         }
       ]
+    },
+    {
+      test: /\.tsx?$/,
+      use: [{
+        loader: 'ts-loader',
+        options: {
+          configFile: 'tsconfig-test.json'
+        }
+      }],
+      exclude: /node_modules/,
     }
   ]
 }
 
 webpackSetting.output = {
   filename: '[name].bundle.js',
-  path: path.resolve(__dirname, 'dist') 
+  path: path.resolve(__dirname, 'test') 
 }
 
 module.exports = webpackSetting

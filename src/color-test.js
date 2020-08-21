@@ -1,4 +1,4 @@
-import UI from './ui.js'
+import { UI } from './ui.ts'
 
 if (typeof window !== 'undefined') {
   const ui = new UI();

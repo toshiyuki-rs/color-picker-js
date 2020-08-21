@@ -1,13 +1,11 @@
-import RgbHs from './rgb-hs.js'
 
-/**
- * @namespace oc.color
- */
+/// <reference path="rgb-hs.ts" />
+import { RgbHs } from './rgb-hs.ts'
 
 /**
  * user interface
  */
-class UI {
+export class UI {
 
   /**
    * defatult template
@@ -81,7 +79,7 @@ class UI {
         result = grayIndex - 2.0 / 4
       }
     }
-    result = parseInt(result * 0xff) 
+    result = result * 0xff
     if (result > 0xff) {
       result = 0xff
     } else if (result < 0) {
@@ -89,6 +87,11 @@ class UI {
     }
     return result
   }
+
+  /**
+   * @type {number | undefined}
+   */
+  private indexValueField 
 
   /**
    * index value
@@ -123,7 +126,6 @@ class UI {
       doSet = typeof value !== 'undefined'
     }
     if (doSet) {
-      /** @private */
       this.indexValueField = value
       if (this.updateUi) {
         setTimeout(function() { this.syncValueUiWithValue() }.bind(this))
@@ -139,7 +141,7 @@ class UI {
   get indexValueInt() {
     let result = this.indexValue
     if (typeof result !== 'undefined') {
-      result = parseInt(result * 0xff)
+      result = result * 0xff
     }
     return result
   }
@@ -186,7 +188,6 @@ class UI {
     if (doSet) {
       let valueUi = this.valueUi
       valueUi.value = value
-      /** @ignore */
       if (this.syncFieldWithUi) {
         setTimeout(function() { this.syncValueWithUi() }.bind(this))
       }
@@ -207,6 +208,11 @@ class UI {
     }
     return result
   }
+
+  /**
+   * color type.
+   */
+  private colorTypeField? : string
 
   /**
    * color type
@@ -232,9 +238,7 @@ class UI {
       doSet = typeof value !== 'undefined'
     }
     if (doSet) {
-      /** @ignore */
       this.colorTypeField = value
-      /** @ignore */
       if (this.updateUi) {
         this.postUpdateColorCircleCanvas()
       }
@@ -253,13 +257,17 @@ class UI {
   }
 
   /**
+   * color location which user selected on color circle
+   */
+  private pickerLocationField?: {radius: number, radian: number}
+
+  /**
    * picker location
    * radius is in range [0, 1]
    * radian is in range [0, Math.PI * 2]
    * @return {{ radius: number, radian: number }} 
    */
   get pickerLocation() {
-    /** @ignore */
     return this.pickerLocationField
   }
   /**
@@ -282,12 +290,10 @@ class UI {
       doSet = typeof value !== 'undefined'
     }
     if (doSet) {
-      /** @ignore */
       this.pickerLocationField = value
       if (this.updateUi) {
         this.postUpdateColorCircleCanvas()
       }
-      /** @ignore */
       if (this.raiseEvent) {
         this.notify('pickerLocation')
       }
@@ -296,8 +302,15 @@ class UI {
 
 
   /**
+   * picker marker
+   */
+  private pickerMarkerField?: (
+    ctx: CanvasRenderingContext2D, 
+    x: number, y: number, r: number, i: number) => void 
+
+  /**
    * picker maker
-   * @return {(ctx: CanvasRenderingcontext2D,
+   * @return {(ctx: CanvasRenderingContext2D,
    *            x: number, y: number, r: number, i: number)=>number}
    */
   get pickerMarker() {
@@ -306,7 +319,7 @@ class UI {
   }
   /**
    * picker marker
-   * @param {pickerMarker: {(ctx: CanvasRenderingcontext2D,
+   * @param {pickerMarker: {(ctx: CanvasRenderingContext2D,
    *            x: number, y: number, r: number, i: number)=>number}}
    */ 
   set pickerMarker(value) {
@@ -322,14 +335,17 @@ class UI {
       doSet = typeof value !== 'undefined'
     }
     if (doSet) {
-      /** @ignore */
       this.pickerMarkerField = value
-      /** @ignore */
       if (this.updateUi) {
         this.postUpdateColorCircleCanvas()
       }
     }
   }
+
+  /**
+   * marker radius 
+   */
+  private markerRadiusField?: number
 
   /**
    * marker radius
@@ -356,9 +372,7 @@ class UI {
       doSet = typeof value !== 'undefined'
     }
     if (doSet) {
-      /** @ignore */
       this.markerRadiusField = value
-      /** @ignore */
       if (this.updateUi) {
         this.postUpdateColorCircleCanvas()
       }
@@ -371,9 +385,7 @@ class UI {
    */
   get colorCircleUi() {
     let result = undefined
-    /** @ignore */
     if (typeof this.rootElement !== 'undefined') {
-      /** @ignore */
       result = this.rootElement.getElementsByClassName(
         this.classMapping.colorCircleCanvas)[0]
     }
@@ -419,9 +431,7 @@ class UI {
       const pickerLocAndIndex = 
         this.convertRgbToPickerLocationAndIndex(value)
       if (typeof pickerLocAndIndex !== 'undefined') {
-        /** @ignore */
         const savedUpdateUi = this.updateUi
-        /** @ignore */
         const savedEvent = this.raiseEvent
         this.updateUi = false 
         this.raiseEvent = false
@@ -429,14 +439,12 @@ class UI {
         this.indexValue = pickerLocAndIndex.indexValue
         this.updateUi = savedUpdateUi
         this.raiseEvent = savedEvent
-        /** @ignore */
         if (this.updateUi) {
           setTimeout(function() { 
             this.syncValueUiWithValue()
           }.bind(this))
           this.postUpdateColorCircleCanvas()
         }
-        /** @ignore */
         if (this.raiseEvent) {
           setTimeout(function() {
             this.notify('pickerLocation')
@@ -445,6 +453,60 @@ class UI {
       }
     }
   }
+
+  /**
+   * @type {boolean}
+   */
+  private updateUi = false
+
+  /**
+   * @type {boolean}
+   */
+  private syncFieldWithUi = false
+
+  /**
+   * internal use to decied whether notify event or not
+   */
+  private raiseEvent = false
+
+  /**
+   * class mapping
+   */
+  private classMapping: 
+    ({ value: string, colorCircleCanvas: string} | undefined) = undefined
+
+  /**
+   * handler for color picker
+   */
+  private pickColorHandler: ((event: Event)=>void | undefined) = undefined
+
+  /**
+   * handler for value event
+   */
+  private valueHandler: ((event: Event)=>void | undefined) = undefined
+
+
+  /**
+   * event listener
+   */
+  private listeners?: object 
+
+
+  /**
+   * root element
+   */
+  private rootElement?: HTMLElement
+
+  /**
+   * saved root element contents
+   */
+  private oldContents?: string
+
+
+  /**
+   * html template
+   */
+  private template?: string
 
   /**
    * constructor
@@ -457,12 +519,10 @@ class UI {
     classMapping = UI.defaultClassNameMapping,
     indexValue = 1.0,
     colorType = 'value') {
-    /** @ignore */
     this.updateUi = false 
-    /** @ignore */
     this.raiseEvent = false
-    /** @ignore */
     this.syncFieldWithUi = false
+
     this.template = template
     this.classMapping = classMapping
     this.indexValue = indexValue
@@ -475,13 +535,9 @@ class UI {
     this.pickerMarker = UI.defaultPickerMarker 
     this.markerRadius = 2
 
-    /** ignore */
     this.listeners = { }
-    /** ignore */
     this.updateUi = true 
-    /** ignore */
     this.raiseEvent = true
-    /** ignore */
     this.syncFieldWithUi = true
   }
 
@@ -491,7 +547,6 @@ class UI {
    */
   bind(rootElement) {
     if (this.template) {
-      /** @ignore */
       this.oldContents = rootElement.innerHTML
       const newContents = this.template
       rootElement.innerHTML = newContents
@@ -508,19 +563,15 @@ class UI {
    * tear down hives
    */
   unbind() {
-    /** @ignore */
     const rootElement = this.rootElement
     if (typeof rootElement !== 'undefined') {
       this.unbindColorCircle(rootElement)
       this.unbindValue(rootElement)
-      /** @ignore */
       if (typeof this.oldContents !== 'undefined') {
-        rootElement.innnerHtml = this.oldContents
+        rootElement.innerHTML = this.oldContents
       }
-      /** @ignore */
-      delete this.oldContents
-      /** @ignore */
-      delete this.rootElement
+      this.oldContents = undefined
+      this.rootElement = undefined
     }
   }
 
@@ -531,13 +582,10 @@ class UI {
    * @param {(type: string, sender: Object)=>void} listener
    */
   addEventListener(type, listener) {
-    /** @ignore */
     if (typeof this.listeners !== 'undefined') {
-      /** @ignore */
       let listeners = this.listeners[type]
       if (typeof listeners === 'undefined') {
         listeners = [];
-        /** @ignore */
         this.listeners[type] = listeners;
       }
       listeners.push(listener)
@@ -573,9 +621,7 @@ class UI {
    * @param {string} type
    */
   notify(type) {
-    /** @ignore */
     if (typeof this.listeners !== 'undefined') {
-      /** @ignore */
       const listeners = this.listeners[type]
       if (listeners !== 'undefined') {
         listeners.forEach(function (elem) { 
@@ -600,15 +646,12 @@ class UI {
       {
         
         setListener: (listener) => { 
-          /** @ignore */
           this.valueHandler = listener
         },
         listener: function(event) {
           if ('input' == event.type) {
-            /** @ignore */
             setTimeout(this.handleValue.bind(this), 0, event)
           } else if ('blur' == event.type) {
-            /** @ignore */
             setTimeout(this.handleValueValidate.bind(this), 0, event)
           }
         }.bind(this),
@@ -621,7 +664,7 @@ class UI {
       if (typeof elem !== 'undefined') {
         elem.addEventListener('input', param.listener)
         elem.addEventListener('blur', param.listener)
-        param.setListener(param.Listener)
+        param.setListener(param.listener)
       }
     })
   }
@@ -630,13 +673,11 @@ class UI {
    * @param {HTMLElement} rootElement
    */
   unbindValue(rootElement) {
-    const listenerParamss = [
+    const listenerParams = [
       {
         clearListener: () => {
-          /** @ignore */
-          delete this.valueHandler
+          this.valueHandler = undefined
         },
-        /** @ignore */
         listener: this.valueHandler,
         className: this.classMapping.value
       }
@@ -646,7 +687,7 @@ class UI {
       const elem = rootElement.getElementsByClassName(param.className)[0]; 
       if (typeof elem !== 'undefined') {
         elem.removeEventListener('click', param.listener)
-        elem.remvoeEventListener('blur', pram.listener)
+        elem.remvoeEventListener('blur', param.listener)
         param.clearListener()
       }
     })
@@ -660,7 +701,6 @@ class UI {
     const colorCircle = rootElement.getElementsByClassName(
       this.classMapping.colorCircleCanvas)[0]
     if (typeof colorCircle !== 'undefined') {
-      /** @ignore */
       this.pickColorHandler = function(event) {
         if (event.type == 'click') {
           this.postHandleClickInColorCircle(event)
@@ -680,8 +720,7 @@ class UI {
       const colorCircle = rootElement.getElementsByClassName(
         this.classMapping.colorCircleCanvas)[0]
       colorCircle.removeEventListener('click', pickColorHandler) 
-      /** @ignore */
-      delete this.pickColorHandler
+      this.pickColorHandler = undefined
     }
   }
 
@@ -776,7 +815,7 @@ class UI {
       vToColorValue)   
     if (typeof result !== 'undefined') {
       for (let i = 0; i < result.length; i++) {
-        result[i] = Math.min(Math.max(parseInt(result[i] * 0xff), 0), 0xff)
+        result[i] = Math.min(Math.max(result[i] * 0xff, 0), 0xff)
       }
     }
     return result
@@ -951,7 +990,7 @@ class UI {
       pickerLoc[1] = -(cartesian[1] - center[1])
       let radian
       if (pickerLoc[0] != 0 || pickerLoc[0] != -0.0) {
-        const tan = parseFloat(pickerLoc[1]) / pickerLoc[0]
+        const tan = pickerLoc[1] / pickerLoc[0]
         radian = Math.atan(tan)
         if (pickerLoc[0] < 0) {
           if (pickerLoc[1] < 0) {
@@ -1041,5 +1080,4 @@ class UI {
   }
 }
 
-export { UI as default}
 // vi: se ts=2 sw=2 et:

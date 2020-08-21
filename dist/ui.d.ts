@@ -1,11 +1,8 @@
-export { UI as default };
-/**
- * @namespace oc.color
- */
+/// <reference path="rgb-hs.d.ts" />
 /**
  * user interface
  */
-declare class UI {
+export declare class UI {
     /**
      * defatult template
      * @return {string}
@@ -24,98 +21,87 @@ declare class UI {
      * @return {(ctx: CanvasRenderingcontext2D,
      *            x: number, y: number, r: number, i: number)=>number}
      */
-    static get defaultPickerMarker(): (ctx: any, x: number, y: number, r: number, i: number) => number;
+    static get defaultPickerMarker(): (ctx: any, x: any, y: any, r: any, i: any) => void;
     /**
      * picker marker
      * @param {number} lineWidth
      * @return {(ctx: CanvasRenderingcontext2D,
      *            x: number, y: number, r: number, i: number)=>number}
      */
-    static createDefaultPickerMarker(lineWidth: number): (ctx: any, x: number, y: number, r: number, i: number) => number;
+    static createDefaultPickerMarker(lineWidth: any): (ctx: any, x: any, y: any, r: any, i: any) => void;
     /**
      * calculate recognizable gray index
      * @param {number} grayIndex
      * @return {number}
      */
-    static calcRecognizableGrayIndex(grayIndex: number): number;
+    static calcRecognizableGrayIndex(grayIndex: any): any;
     /**
-     * constructor
-     * @param {string} template
-     * @param {{value: string, colorCircleCanvas: string}} classMapping
-     * @param {number} indexValue
-     * @param {number} colorType
+     * @type {number | undefined}
      */
-    constructor(template?: string, classMapping?: {
-        value: string;
-        colorCircleCanvas: string;
-    }, indexValue?: number, colorType?: number);
+    private indexValueField;
+    /**
+     * index value
+     * @return {number | undefined}
+     */
+    get indexValue(): any;
     /**
      * index value
      * @param {number | undefined} value
      * @return {number}
      */
-    set indexValue(arg: number);
+    set indexValue(value: any);
     /**
-     * index value
+     * index value as integer
      * @return {number | undefined}
      */
-    get indexValue(): number;
-    /** @private */
-    private indexValueField;
+    get indexValueInt(): any;
     /**
      * index value as integer
      * @param {number} value
      * @return {number}
      */
-    set indexValueInt(arg: number);
+    set indexValueInt(value: any);
     /**
-     * index value as integer
+     * index value on user interface
      * @return {number | undefined}
      */
-    get indexValueInt(): number;
+    get indexValueUi(): any;
     /**
      * index value on user interface
      * @param {number} value
      */
-    set indexValueUi(arg: number);
-    /**
-     * index value on user interface
-     * @return {number | undefined}
-     */
-    get indexValueUi(): number;
+    set indexValueUi(value: any);
     /**
      *  value user interface
      *  @return {HTMLInputElement | undefined}
      */
-    get valueUi(): HTMLInputElement;
+    get valueUi(): any;
     /**
-     * color type
-     * @param {string}
+     * color type.
      */
-    set colorType(arg: string);
+    private colorTypeField?;
     /**
      * color type
      * @return {string | undefined}
      */
     get colorType(): string;
-    /** @ignore */
-    colorTypeField: string;
+    /**
+     * color type
+     * @param {string}
+     */
+    set colorType(value: string);
     /**
      * color index value
      * @return {{ value: number, type: string }}
      */
     get colorIndexValue(): {
-        value: number;
+        value: any;
         type: string;
     };
     /**
-     * picker location
-     * @param {{ radius: number, radian: number }} value
+     * color location which user selected on color circle
      */
-    set pickerLocation(arg: {
-        radius: number;
-        radian: number;
-    });
+    private pickerLocationField?;
     /**
      * picker location
      * radius is in range [0, 1]
@@ -126,71 +112,115 @@ declare class UI {
         radius: number;
         radian: number;
     };
-    /** @ignore */
-    pickerLocationField: {
+    /**
+     * picker location
+     * @param {{ radius: number, radian: number }} value
+     */
+    set pickerLocation(value: {
         radius: number;
         radian: number;
-    };
+    });
     /**
      * picker marker
-     * @param {pickerMarker: {(ctx: CanvasRenderingcontext2D,
-     *            x: number, y: number, r: number, i: number)=>number}}
      */
-    set pickerMarker(arg: (ctx: any, x: number, y: number, r: number, i: number) => number);
+    private pickerMarkerField?;
     /**
      * picker maker
-     * @return {(ctx: CanvasRenderingcontext2D,
+     * @return {(ctx: CanvasRenderingContext2D,
      *            x: number, y: number, r: number, i: number)=>number}
      */
-    get pickerMarker(): (ctx: any, x: number, y: number, r: number, i: number) => number;
-    /** @ignore */
-    pickerMarkerField: (ctx: any, x: number, y: number, r: number, i: number) => number;
+    get pickerMarker(): (ctx: CanvasRenderingContext2D, x: number, y: number, r: number, i: number) => void;
+    /**
+     * picker marker
+     * @param {pickerMarker: {(ctx: CanvasRenderingContext2D,
+     *            x: number, y: number, r: number, i: number)=>number}}
+     */
+    set pickerMarker(value: (ctx: CanvasRenderingContext2D, x: number, y: number, r: number, i: number) => void);
     /**
      * marker radius
-     * @param {number} value
      */
-    set markerRadius(arg: number);
+    private markerRadiusField?;
     /**
      * marker radius
      * @return {number}
      */
     get markerRadius(): number;
-    /** @ignore */
-    markerRadiusField: number;
+    /**
+     * marker radius
+     * @param {number} value
+     */
+    set markerRadius(value: number);
     /**
      * color circle user interface
      * @return {HTMLCanvasElement}
      */
-    get colorCircleUi(): HTMLCanvasElement;
-    /**
-     * set mark color
-     * @param {number[]} value
-     */
-    set markColor(arg: number[]);
+    get colorCircleUi(): any;
     /**
      * marker color
      * @return {number[]}
      */
-    get markColor(): number[];
-    updateUi: any;
-    raiseEvent: any;
-    /** @ignore */
-    syncFieldWithUi: any;
-    template: string;
-    classMapping: {
+    get markColor(): any;
+    /**
+     * set mark color
+     * @param {number[]} value
+     */
+    set markColor(value: any);
+    /**
+     * @type {boolean}
+     */
+    private updateUi;
+    /**
+     * @type {boolean}
+     */
+    private syncFieldWithUi;
+    /**
+     * internal use to decied whether notify event or not
+     */
+    private raiseEvent;
+    /**
+     * class mapping
+     */
+    private classMapping;
+    /**
+     * handler for color picker
+     */
+    private pickColorHandler;
+    /**
+     * handler for value event
+     */
+    private valueHandler;
+    /**
+     * event listener
+     */
+    private listeners?;
+    /**
+     * root element
+     */
+    private rootElement?;
+    /**
+     * saved root element contents
+     */
+    private oldContents?;
+    /**
+     * html template
+     */
+    private template?;
+    /**
+     * constructor
+     * @param {string} template
+     * @param {{value: string, colorCircleCanvas: string}} classMapping
+     * @param {number} indexValue
+     * @param {number} colorType
+     */
+    constructor(template?: string, classMapping?: {
         value: string;
         colorCircleCanvas: string;
-    };
-    /** ignore */
-    listeners: {};
+    }, indexValue?: number, colorType?: string);
     /**
      * hive into root element
      * @param {HTMLElement} rootElement
      */
-    bind(rootElement: HTMLElement): void;
-    /** @ignore */
-    oldContents: string;
-    rootElement: HTMLElement;
+    bind(rootElement: any): void;
     /**
      * tear down hives
      */
@@ -200,60 +230,53 @@ declare class UI {
      * @param {string} type
      * @param {(type: string, sender: Object)=>void} listener
      */
-    addEventListener(type: string, listener: (type: string, sender: any) => void): void;
+    addEventListener(type: any, listener: any): void;
     /**
      * remove event listener
      * @param {string} type
      * @param {(type: string, sender: Object)=>void} listener
      */
-    removeEventListener(type: string, listener: (type: string, sender: any) => void): void;
+    removeEventListener(type: any, listener: any): void;
     /**
      * notify event message to event listener
      * @param {string} type
      */
-    notify(type: string): void;
+    notify(type: any): void;
     /**
      * attach callbacks to button
      * @param {HTMLElement} rootElement
      */
-    bindValue(rootElement: HTMLElement): void;
-    /** @ignore */
-    valueHandler: any;
+    bindValue(rootElement: any): void;
     /**
      * attach callbacks to button
      * @param {HTMLElement} rootElement
      */
-    unbindValue(rootElement: HTMLElement): void;
+    unbindValue(rootElement: any): void;
     /**
      * bind color circle
      * @param {HTMLElement} rootElement
      */
-    bindColorCircle(rootElement: HTMLElement): void;
-    /** @ignore */
-    pickColorHandler: any;
+    bindColorCircle(rootElement: any): void;
     /**
      * detach handler for color circle
      * @param {HTMLElement} rootElement
      */
-    unbindColorCircle(rootElement: HTMLElement): void;
+    unbindColorCircle(rootElement: any): void;
     /**
      * handle event for clicking in color circle canvas lately.
      * @param {Event} event
      */
-    postHandleClickInColorCircle(event: Event): void;
+    postHandleClickInColorCircle(event: any): void;
     /**
      * handle event for clicking in color circle canvas
      * @param {Event} event
      */
-    handleClickInColorCircle(event: Event): void;
+    handleClickInColorCircle(event: any): void;
     /**
      * color circle location and radius
      * @param {HTMLCanvasElement} colorCanvas
      */
-    getColorCircleLocRadius(colorCanvas: HTMLCanvasElement): {
-        loc: number[];
-        radius: number;
-    };
+    getColorCircleLocRadius(colorCanvas: any): any;
     /**
      * update color circle canvas lately
      */
@@ -262,29 +285,20 @@ declare class UI {
      * update color circle canvas
      * @param {HTMLElement} rootElement
      */
-    updateColorCircleCanvas(rootElement: HTMLElement): void;
+    updateColorCircleCanvas(rootElement: any): void;
     /**
      * picker location to rgb
      * @param {{radius: number, radian: number}} pickerLoc
      * @return {number[]}
      */
-    convertPickerLocToRgb(pickerLoc: {
-        radius: number;
-        radian: number;
-    }): number[];
+    convertPickerLocToRgb(pickerLoc: any): any;
     /**
      * convert rgb to marker position and index
      * @param {number[]} rgb255
      * @return {{ indexValue: number,
      *            pickerLocation: {radius: number, radian: number } }}
      */
-    convertRgbToPickerLocationAndIndex(rgb255: number[]): {
-        indexValue: number;
-        pickerLocation: {
-            radius: number;
-            radian: number;
-        };
-    };
+    convertRgbToPickerLocationAndIndex(rgb255: any): any;
     /**
      * update color circle
      * @param {CanvasRenderingcontext2D} ctx
@@ -306,17 +320,14 @@ declare class UI {
      * @param {{ radius: number, radian: number }}
      * @return {number[]}
      */
-    calcCanvasLocationFromPickerLocation(canvas: HTMLCanvasElement, pickerLocation: any): number[];
+    calcCanvasLocationFromPickerLocation(canvas: any, pickerLocation: any): any;
     /**
      * calculate picker location from cartesian on  canvas
      * @param {HTMLCanvasElement} canvas
      * @param {number[]} cartesian
      * @return {{ radian: number, radius: number }}
      */
-    calcPickerLocationFromCanvasLocation(canvas: HTMLCanvasElement, cartesian: number[]): {
-        radian: number;
-        radius: number;
-    };
+    calcPickerLocationFromCanvasLocation(canvas: any, cartesian: any): any;
     /**
      * varidate value input
      */
@@ -325,7 +336,7 @@ declare class UI {
      * handle index increment event
      * @param {Event} event
      */
-    handleValue(event: Event): void;
+    handleValue(event: any): void;
     /**
      * synchronize index value with value user interface.
      */

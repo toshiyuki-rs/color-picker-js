@@ -1,11 +1,11 @@
 {
   "name": "@oc-soft/color-picker",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Provide user interface to select color",
   "type": "module",
   "exports": {
-    ".": "./src/js/ui.js",
-    "./rgb-hs": "./src/js/rgb-hs.js"
+    ".": "./dist/ui.js",
+    "./rgb-hs": "./dist/rgb-hs.js"
   },
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config webpack.config.cjs"
+    "build-test": "webpack --config webpack.config-test.cjs"
   },
   "keywords": [
     "ui",
@@ -34,6 +34,8 @@
     "less-loader": "^6.2.0",
     "mini-css-extract-plugin": "^0.9.0",
     "source-map-loader": "^1.0.1",
+    "ts-loader": "^8.0.2",
+    "typescript": "^3.9.7",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
   }
