@@ -623,7 +623,7 @@ export class UI {
   notify(type) {
     if (typeof this.listeners !== 'undefined') {
       const listeners = this.listeners[type]
-      if (listeners !== 'undefined') {
+      if (typeof listeners !== 'undefined') {
         listeners.forEach(function (elem) { 
           elem({ 
             type, 
