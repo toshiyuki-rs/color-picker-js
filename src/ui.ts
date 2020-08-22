@@ -1,5 +1,5 @@
 
-/// <reference path="rgb-hs.ts" />
+// @ts-ignore
 import { RgbHs } from './rgb-hs.ts'
 
 /**
