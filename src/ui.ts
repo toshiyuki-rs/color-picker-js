@@ -218,7 +218,7 @@ export class UI {
    * color type
    * @return {string | undefined}
    */
-  get colorType() {
+  get colorType(): (string | undefined) {
     /** @ignore */
     return this.colorTypeField;
   }
@@ -227,7 +227,7 @@ export class UI {
    * color type
    * @param {string}
    */
-  set colorType(value) {
+  set colorType(value: string) {
     const thisValue = this.colorType
     let doSet = false
     if (typeof thisValue !== 'undefined') {
@@ -249,7 +249,7 @@ export class UI {
    * color index value
    * @return {{ value: number, type: string }}
    */
-  get colorIndexValue() {
+  get colorIndexValue(): {value: number, type: (string | undefined)} {
     return {
       value: this.indexValue,
       type: this.colorType
@@ -506,7 +506,7 @@ export class UI {
   /**
    * html template
    */
-  private template?: string
+  public template?: (string | undefined | null)
 
   /**
    * constructor
@@ -687,7 +687,7 @@ export class UI {
       const elem = rootElement.getElementsByClassName(param.className)[0]; 
       if (typeof elem !== 'undefined') {
         elem.removeEventListener('click', param.listener)
-        elem.remvoeEventListener('blur', param.listener)
+        elem.removeEventListener('blur', param.listener)
         param.clearListener()
       }
     })
@@ -738,7 +738,7 @@ export class UI {
    * handle event for clicking in color circle canvas
    * @param {Event} event
    */
-  handleClickInColorCircle(event) {
+  handleClickInColorCircle(event: MouseEvent) {
     const canvas = event.target
     const pickerLoc = this.calcPickerLocationFromCanvasLocation(canvas,
       [event.offsetX, event.offsetY]) 
@@ -934,7 +934,6 @@ export class UI {
         && typeof pickerMarker !== 'undefined'
         && typeof colorIndexValue !== 'undefined'
         && typeof markerRadius !== 'undefined') {
-
         pickerMarker(ctx, 
           Math.round(canvasLoc[0]), 
           Math.round(canvasLoc[1]),
