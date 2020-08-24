@@ -25,7 +25,8 @@ export class UI {
    * default template mapping
    * @return {{value: string, colorCircleCanvas: string}}
    */
-  static get defaultClassNameMapping() {
+  static get defaultClassNameMapping():
+      {value: string, colorCircleCanvas: string}  {
     return {
       value: 'oc-value',
       colorCircleCanvas: 'oc-color-circle'
@@ -36,7 +37,12 @@ export class UI {
    * @return {(ctx: CanvasRenderingcontext2D,
    *            x: number, y: number, r: number, i: number)=>number}
    */
-  static get defaultPickerMarker() {
+  static get defaultPickerMarker():
+    ((ctx: CanvasRenderingContext2D,
+      x: number, 
+      y: number, 
+      r: number, 
+      i: number)=>void)  {
     return UI.createDefaultPickerMarker(1.0)
   }
  
@@ -46,7 +52,12 @@ export class UI {
    * @return {(ctx: CanvasRenderingcontext2D,
    *            x: number, y: number, r: number, i: number)=>number}
    */
-  static createDefaultPickerMarker(lineWidth) {
+  static createDefaultPickerMarker(lineWidth):
+    ((ctx: CanvasRenderingContext2D,
+      x: number,
+      y: number,
+      r: number, 
+      i: number)=>void) {
     return (ctx, x, y, r, i) => {
 
       const savedLineWidth = ctx.lineWidth
@@ -68,7 +79,7 @@ export class UI {
    * @param {number} grayIndex
    * @return {number} 
    */
-  static calcRecognizableGrayIndex(grayIndex) {
+  static calcRecognizableGrayIndex(grayIndex): number {
     let result
     if (grayIndex < 1.0 / 4 || grayIndex >= 3.0 / 4) {
       result = 1 - grayIndex
@@ -91,13 +102,13 @@ export class UI {
   /**
    * @type {number | undefined}
    */
-  private indexValueField 
+  private indexValueField: number | undefined
 
   /**
    * index value
    * @return {number | undefined}
    */
-  get indexValue() {
+  get indexValue(): number | undefined {
     /** @private */
     return this.indexValueField
   }
@@ -105,9 +116,8 @@ export class UI {
   /**
    * index value
    * @param {number | undefined} value
-   * @return {number}
    */
-  set indexValue(value) {
+  set indexValue(value: number) {
     const thisValue = this.indexValue
     let doSet = false
     if (typeof value !== 'undefined') {
@@ -138,7 +148,7 @@ export class UI {
    * index value as integer
    * @return {number | undefined}
    */
-  get indexValueInt() {
+  get indexValueInt(): number | undefined {
     let result = this.indexValue
     if (typeof result !== 'undefined') {
       result = result * 0xff
@@ -149,11 +159,10 @@ export class UI {
   /**
    * index value as integer
    * @param {number} value
-   * @return {number}
    */
-  set indexValueInt(value) {
+  set indexValueInt(value: number | undefined) {
     if (typeof value !== 'undefined') {
-      value = parseFloat(value) / 0xff
+      value = value / 0xff
     }
     this.indexValue = value
   }
@@ -162,7 +171,7 @@ export class UI {
    * index value on user interface
    * @return {number | undefined}
    */
-  get indexValueUi() {
+  get indexValueUi(): number | undefined {
     let result
     let valueUi = this.valueUi
     if (typeof valueUi !== 'undefined') {
@@ -178,7 +187,7 @@ export class UI {
    * index value on user interface
    * @param {number} value 
    */
-  set indexValueUi(value) {
+  set indexValueUi(value: number) {
     const thisValue = this.indexValueUi
     let doSet = false
     doSet = typeof value !== 'undefined'
@@ -187,7 +196,7 @@ export class UI {
     }
     if (doSet) {
       let valueUi = this.valueUi
-      valueUi.value = value
+      valueUi.value = value.toString()
       if (this.syncFieldWithUi) {
         setTimeout(function() { this.syncValueWithUi() }.bind(this))
       }
@@ -200,7 +209,7 @@ export class UI {
    *  value user interface
    *  @return {HTMLInputElement | undefined}
    */
-  get valueUi() {
+  get valueUi(): HTMLInputElement | undefined {
     let result
     if (typeof this.rootElement !== 'undefined') {
       result = this.rootElement.getElementsByClassName(
@@ -249,7 +258,7 @@ export class UI {
    * color index value
    * @return {{ value: number, type: string }}
    */
-  get colorIndexValue(): {value: number, type: (string | undefined)} {
+  get colorIndexValue(): {value: number, type: string | undefined} {
     return {
       value: this.indexValue,
       type: this.colorType
@@ -267,14 +276,14 @@ export class UI {
    * radian is in range [0, Math.PI * 2]
    * @return {{ radius: number, radian: number }} 
    */
-  get pickerLocation() {
+  get pickerLocation(): { radius: number, radian: number } {
     return this.pickerLocationField
   }
   /**
    * picker location
    * @param {{ radius: number, radian: number }} value
    */
-  set pickerLocation(value) {
+  set pickerLocation(value: {radius: number, radian: number} | undefined) {
     const thisValue = this.pickerLocation
     let doSet = false
     if (typeof thisValue !== 'undefined') {
@@ -313,7 +322,10 @@ export class UI {
    * @return {(ctx: CanvasRenderingContext2D,
    *            x: number, y: number, r: number, i: number)=>number}
    */
-  get pickerMarker() {
+  get pickerMarker(): (
+    (ctx: CanvasRenderingContext2D, 
+      x: number, y: number, r: number, i: number) => void) 
+    | undefined {
     /** @ignore */
     return this.pickerMarkerField
   }
@@ -322,7 +334,11 @@ export class UI {
    * @param {pickerMarker: {(ctx: CanvasRenderingContext2D,
    *            x: number, y: number, r: number, i: number)=>number}}
    */ 
-  set pickerMarker(value) {
+  set pickerMarker(
+    value:(
+      (ctx: CanvasRenderingContext2D, 
+        x: number, y: number, r: number, i: number) => void) 
+      | undefined) {
     const thisValue = this.pickerMarker
     let doSet = false
     if (typeof thisValue !== 'undefined') {
@@ -351,7 +367,7 @@ export class UI {
    * marker radius
    * @return {number}
    */
-  get markerRadius() {
+  get markerRadius(): number | undefined {
     /** @ignore */
     return this.markerRadiusField
   }
@@ -359,7 +375,7 @@ export class UI {
    * marker radius
    * @param {number} value
    */
-  set markerRadius(value) {
+  set markerRadius(value: number | undefined) {
     const thisValue = this.markerRadius
     let doSet = false
     if (typeof thisValue !== 'undefined') {
@@ -383,7 +399,7 @@ export class UI {
    * color circle user interface
    * @return {HTMLCanvasElement}
    */
-  get colorCircleUi() {
+  get colorCircleUi(): HTMLCanvasElement | undefined {
     let result = undefined
     if (typeof this.rootElement !== 'undefined') {
       result = this.rootElement.getElementsByClassName(
@@ -396,7 +412,7 @@ export class UI {
    * marker color
    * @return {number[]} 
    */
-  get markColor() {
+  get markColor(): number[] | undefined {
     let result = undefined
     const colorCircle = this.colorCircleUi 
     if (typeof colorCircle !== 'undefined') {
@@ -412,7 +428,7 @@ export class UI {
    * set mark color
    * @param {number[]} value
    */
-  set markColor(value) {
+  set markColor(value: number[] | undefined) {
     const thisValue = this.markColor
     let doSet = false
     if (typeof thisValue !== 'undefined') {
@@ -457,17 +473,17 @@ export class UI {
   /**
    * @type {boolean}
    */
-  private updateUi = false
+  private updateUi: boolean = false
 
   /**
    * @type {boolean}
    */
-  private syncFieldWithUi = false
+  private syncFieldWithUi: boolean = false
 
   /**
    * internal use to decied whether notify event or not
    */
-  private raiseEvent = false
+  private raiseEvent: boolean  = false
 
   /**
    * class mapping
@@ -515,10 +531,13 @@ export class UI {
    * @param {number} indexValue
    * @param {number} colorType
    */
-  constructor(template = UI.defaultTemplate,
-    classMapping = UI.defaultClassNameMapping,
-    indexValue = 1.0,
-    colorType = 'value') {
+  constructor(template: string | null | undefined = UI.defaultTemplate,
+    classMapping:
+      {value: string, colorCircleCanvas: string}
+      | undefined
+      | null = UI.defaultClassNameMapping,
+    indexValue: number  = 1.0,
+    colorType: string  = 'value') {
     this.updateUi = false 
     this.raiseEvent = false
     this.syncFieldWithUi = false
@@ -545,7 +564,7 @@ export class UI {
    * hive into root element
    * @param {HTMLElement} rootElement
    */
-  bind(rootElement) {
+  bind(rootElement: HTMLElement) {
     if (this.template) {
       this.oldContents = rootElement.innerHTML
       const newContents = this.template
@@ -581,7 +600,9 @@ export class UI {
    * @param {string} type
    * @param {(type: string, sender: Object)=>void} listener
    */
-  addEventListener(type, listener) {
+  addEventListener(
+    type: string, 
+    listener: (type: string, sender: Object)=>void) {
     if (typeof this.listeners !== 'undefined') {
       let listeners = this.listeners[type]
       if (typeof listeners === 'undefined') {
@@ -597,7 +618,9 @@ export class UI {
    * @param {string} type
    * @param {(type: string, sender: Object)=>void} listener
    */
-  removeEventListener(type, listener) {
+  removeEventListener(
+    type: string,
+    listener: (type: string, sender: Object)=>void) {
     if (typeof this.listeners !== 'undefined') {
       const listeners = this.listeners[type]
       if (typeof listeners !== 'undefined') {
@@ -620,7 +643,7 @@ export class UI {
    * notify event message to event listener
    * @param {string} type
    */
-  notify(type) {
+  notify(type: string) {
     if (typeof this.listeners !== 'undefined') {
       const listeners = this.listeners[type]
       if (typeof listeners !== 'undefined') {
@@ -641,7 +664,7 @@ export class UI {
    * attach callbacks to button
    * @param {HTMLElement} rootElement
    */
-  bindValue(rootElement) {
+  bindValue(rootElement: HTMLElement) {
     const listenerParams = [
       {
         
@@ -672,7 +695,7 @@ export class UI {
    * attach callbacks to button
    * @param {HTMLElement} rootElement
    */
-  unbindValue(rootElement) {
+  unbindValue(rootElement: HTMLElement) {
     const listenerParams = [
       {
         clearListener: () => {
@@ -697,7 +720,7 @@ export class UI {
    * bind color circle
    * @param {HTMLElement} rootElement
    */
-  bindColorCircle(rootElement) {
+  bindColorCircle(rootElement: HTMLElement) {
     const colorCircle = rootElement.getElementsByClassName(
       this.classMapping.colorCircleCanvas)[0]
     if (typeof colorCircle !== 'undefined') {
@@ -714,7 +737,7 @@ export class UI {
    * detach handler for color circle
    * @param {HTMLElement} rootElement
    */
-  unbindColorCircle(rootElement) {
+  unbindColorCircle(rootElement: HTMLElement) {
     const pickColorHandler = this.pickColorHandler
     if (typeof pickColorHandler !== 'undefined') {
       const colorCircle = rootElement.getElementsByClassName(
@@ -728,7 +751,7 @@ export class UI {
    * handle event for clicking in color circle canvas lately.
    * @param {Event} event
    */
-  postHandleClickInColorCircle(event) {
+  postHandleClickInColorCircle(event: Event) {
     setTimeout(function() {
       this.handleClickInColorCircle(event)
     }.bind(this))
@@ -739,8 +762,9 @@ export class UI {
    * @param {Event} event
    */
   handleClickInColorCircle(event: MouseEvent) {
-    const canvas = event.target
-    const pickerLoc = this.calcPickerLocationFromCanvasLocation(canvas,
+    const canvas = event.target as HTMLCanvasElement
+    const pickerLoc = this.calcPickerLocationFromCanvasLocation(
+      canvas,
       [event.offsetX, event.offsetY]) 
     if (typeof pickerLoc !== 'undefined') {
       this.pickerLocation = pickerLoc
@@ -752,7 +776,8 @@ export class UI {
    * color circle location and radius
    * @param {HTMLCanvasElement} colorCanvas
    */
-  getColorCircleLocRadius(colorCanvas) {
+  getColorCircleLocRadius(colorCanvas: HTMLCanvasElement):
+    {loc: number[], radius: number} {
     let result = undefined
     if (typeof colorCanvas !== 'undefined') {
       let radius = undefined
@@ -787,9 +812,9 @@ export class UI {
    * update color circle canvas
    * @param {HTMLElement} rootElement
    */
-  updateColorCircleCanvas(rootElement) {
+  updateColorCircleCanvas(rootElement: HTMLElement) {
     const colorCanvas = rootElement.getElementsByClassName(
-      this.classMapping.colorCircleCanvas)[0];
+      this.classMapping.colorCircleCanvas)[0] as HTMLCanvasElement;
     if (typeof colorCanvas !== 'undefined') {
       if (typeof colorCanvas.getContext === 'function') {
         const ctx = colorCanvas.getContext('2d')
@@ -805,7 +830,8 @@ export class UI {
    * @param {{radius: number, radian: number}} pickerLoc
    * @return {number[]}
    */
-  convertPickerLocToRgb(pickerLoc) {
+  convertPickerLocToRgb(
+    pickerLoc: {radius: number, radian: number}): number[] {
     let result = undefined
     const indexValue = this.colorIndexValue
     const vToColorValue = RgbHs.indexValueToColorValueFunctions[indexValue.type]
@@ -827,12 +853,15 @@ export class UI {
    * @return {{ indexValue: number,
    *            pickerLocation: {radius: number, radian: number } }}
    */
-  convertRgbToPickerLocationAndIndex(rgb255) {
+  convertRgbToPickerLocationAndIndex(
+    rgb255 : number[]): { 
+      indexValue: number,
+    pickerLocation: {radius: number, radian: number } } {
     let result = undefined
     if (this.colorType == 'value') {
       let rgb = [0, 0, 0]
       for (let i = 0; i < rgb.length; i++) {
-        rgb[i] = parseFloat(rgb255[i]) / 0xff
+        rgb[i] = rgb255[i] / 0xff
       }
       const hueChroma = RgbHs.calcHueChroma(rgb) 
       const indexValue = rgb[hueChroma.chroma.maxIndex]
@@ -852,7 +881,7 @@ export class UI {
    * update color circle
    * @param {CanvasRenderingcontext2D} ctx
    */
-  updateColorCircle(ctx) {
+  updateColorCircle(ctx: CanvasRenderingContext2D) {
     const locRadius = this.getColorCircleLocRadius(ctx.canvas)
     const indexValue = this.colorIndexValue
     const imageData = ctx.getImageData(
@@ -884,7 +913,7 @@ export class UI {
    * update color circle
    * @param {CanvasRenderingcontext2D} ctx
    */
-  updateColorCircleProgress(ctx) {
+  updateColorCircleProgress(ctx: CanvasRenderingContext2D) {
     const locRadius = this.getColorCircleLocRadius(ctx.canvas)
     const indexValue = this.colorIndexValue
   
@@ -921,7 +950,7 @@ export class UI {
    * update picker marker
    * @param {CanvasRenderingcontext2D} ctx
    */
-  updatePickerMarker(ctx) {
+  updatePickerMarker(ctx: CanvasRenderingContext2D) {
     const pickerLocation = this.pickerLocation
     if (typeof pickerLocation !== 'undefined') {
       const canvasLoc = this.calcCanvasLocationFromPickerLocation(
@@ -948,7 +977,9 @@ export class UI {
    * @param {{ radius: number, radian: number }}
    * @return {number[]}
    */
-  calcCanvasLocationFromPickerLocation(canvas, pickerLocation) {
+  calcCanvasLocationFromPickerLocation(
+    canvas: HTMLCanvasElement,
+    pickerLocation: {radius: number, radian: number}): number[] {
     let result
     if (typeof pickerLocation !== 'undefined') {
       const locRadius = this.getColorCircleLocRadius(canvas)
@@ -975,7 +1006,9 @@ export class UI {
    * @param {number[]} cartesian
    * @return {{ radian: number, radius: number }}
    */
-  calcPickerLocationFromCanvasLocation(canvas, cartesian) {
+  calcPickerLocationFromCanvasLocation(
+    canvas: HTMLCanvasElement, 
+    cartesian: number[]): { radian: number, radius: number } {
     let result
     if (typeof cartesian !== 'undefined') {
       const locRadius = this.getColorCircleLocRadius(canvas)
@@ -1049,7 +1082,7 @@ export class UI {
    * handle index increment event
    * @param {Event} event
    */
-  handleValue(event) {
+  handleValue(event: Event) {
     this.syncValueWithUi() 
   }
 
