@@ -16,7 +16,7 @@ export class UI {
   <canvas class="oc-color-circle" width="200px" height="200px"></canvas>
 </div>
 <div class="oc-color-controller">
-  <input class="oc-value" type="number" min="0" max="255">
+  <input class="oc-value" type="range" min="0" max="255">
 </div>
 `
   }
