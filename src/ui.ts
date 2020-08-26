@@ -602,7 +602,7 @@ export class UI {
    */
   addEventListener(
     type: string, 
-    listener: ({type: string, sender: Object})=>void) {
+    listener: (arg: {type: string, sender: Object})=>void) {
     if (typeof this.listeners !== 'undefined') {
       let listeners = this.listeners[type]
       if (typeof listeners === 'undefined') {
@@ -620,7 +620,7 @@ export class UI {
    */
   removeEventListener(
     type: string,
-    listener: ({type: string, sender: Object})=>void) {
+    listener: (arg: {type: string, sender: Object})=>void) {
     if (typeof this.listeners !== 'undefined') {
       const listeners = this.listeners[type]
       if (typeof listeners !== 'undefined') {
