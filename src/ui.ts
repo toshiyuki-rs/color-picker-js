@@ -602,7 +602,7 @@ export class UI {
    */
   addEventListener(
     type: string, 
-    listener: (type: string, sender: Object)=>void) {
+    listener: ({type: string, sender: Object})=>void) {
     if (typeof this.listeners !== 'undefined') {
       let listeners = this.listeners[type]
       if (typeof listeners === 'undefined') {
@@ -620,7 +620,7 @@ export class UI {
    */
   removeEventListener(
     type: string,
-    listener: (type: string, sender: Object)=>void) {
+    listener: ({type: string, sender: Object})=>void) {
     if (typeof this.listeners !== 'undefined') {
       const listeners = this.listeners[type]
       if (typeof listeners !== 'undefined') {
@@ -888,8 +888,8 @@ export class UI {
       locRadius.loc[0], locRadius.loc[1],
       locRadius.radius * 2, locRadius.radius * 2)
       
-    for (let rIndex = 0; rIndex <= locRadius.radius * 2; rIndex++) {
-      for (let cIndex = 0; cIndex <= locRadius.radius * 2; cIndex++) {
+    for (let rIndex = 0; rIndex < locRadius.radius * 2; rIndex++) {
+      for (let cIndex = 0; cIndex < locRadius.radius * 2; cIndex++) {
         const x = cIndex - locRadius.radius
         const y = locRadius.radius - rIndex
         const rgb = RgbHs.xyrvToRgb(x, y, locRadius.radius, 
