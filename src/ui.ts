@@ -841,7 +841,7 @@ export class UI {
       vToColorValue)   
     if (typeof result !== 'undefined') {
       for (let i = 0; i < result.length; i++) {
-        result[i] = Math.min(Math.max(result[i] * 0xff, 0), 0xff)
+        result[i] = Math.round(Math.min(Math.max(result[i] * 0xff, 0), 0xff))
       }
     }
     return result
@@ -856,7 +856,7 @@ export class UI {
   convertRgbToPickerLocationAndIndex(
     rgb255 : number[]): { 
       indexValue: number,
-    pickerLocation: {radius: number, radian: number } } {
+      pickerLocation: {radius: number, radian: number } } {
     let result = undefined
     if (this.colorType == 'value') {
       let rgb = [0, 0, 0]
@@ -866,7 +866,7 @@ export class UI {
       const hueChroma = RgbHs.calcHueChroma(rgb) 
       const indexValue = rgb[hueChroma.chroma.maxIndex]
       const pickerLocation = {
-        radius: hueChroma.chroma.value / indexValue,
+        radius: hueChroma.chroma.value,
         radian: (hueChroma.hue * Math.PI) / 180
       }
       result = {

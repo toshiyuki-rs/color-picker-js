@@ -5,20 +5,18 @@ if (typeof window !== 'undefined') {
   const savedLoad = window.onload
   const logColor = (e) => {
     const color = e.target.markColor 
-    const colorStr = [
-      color[0].toString(16), 
-      color[1].toString(16), 
-      color[2].toString(16)]
-    console.log(colorStr)
+    console.log(color)
   }
   const handleUnload = () => {
     ui.removeEventListener('pickerLocation', logColor)
     ui.unbind()
   }
   const initialSetting = ()=> {
-    // ui.markColor = [0x38, 0xbb, 0xda, 0xff]
+    const testColor = [0x38, 0xbb, 0xda, 0xff]
+    console.log(testColor)
+    ui.markColor = testColor
     // ui.markColor = [0xda, 0x0, 0x0, 0xff]
-    ui.markColor = [0x0, 0xda, 0x0, 0xff]
+    // ui.markColor = [0x0, 0xda, 0x0, 0xff]
     // ui.markColor = [218, 0, 0, 0xff]
   }
   const handleLoad = () => {

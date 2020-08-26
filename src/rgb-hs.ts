@@ -9,7 +9,7 @@ export class RgbHs {
    * @param {number[]} rgb
    * @return {number}
    */
-  static rgbToHex(rgb) {
+  static rgbToHex(rgb: number[]): number {
     let result;
     result = Math.round(rgb[0] * 255) << 16;
     for (var index = 1; index < 3; index++) {
@@ -23,7 +23,7 @@ export class RgbHs {
    * @param {number} rgb
    * @return {number[]}
    */
-  static hexToRgb(rgb) {
+  static hexToRgb(rgb: number): number[] {
     let intMask;
     intMask = [0xff0000, 0x00ff00, 0x0000ff];
        
@@ -40,7 +40,8 @@ export class RgbHs {
    * @param {{red: number, green: number, blue: number}} rgb
    * @return {number[]}
    */
-  static toRgbArray(rgb) {
+  static toRgbArray(
+    rgb: {red: number, green: number, blue: number}): number[] {
     return [rgb.red, rgb.green, rgb.blue];
   }
 
@@ -49,7 +50,9 @@ export class RgbHs {
    * @param {number[]} rgb
    * @param {(a: number, b: number) => number} comparator
    */
-  static findIndex(rgb, comparator) {
+  static findIndex(
+    rgb: number[], 
+    comparator: (a: number, b: number) => number): number {
     let result;
     let index;
     result = 0;
@@ -65,7 +68,7 @@ export class RgbHs {
    * find max index
    * @param {number[]} rgb
    */
-  static findMaxIndex(rgb) {
+  static findMaxIndex(rgb: number[]): number {
     return RgbHs.findIndex(rgb, 
       (value1, value2) => { 
         return value2 - value1;
@@ -76,7 +79,7 @@ export class RgbHs {
    * find minimum index
    * @param {number[]} rgb
    */
-  static findMinIndex(rgb) {
+  static findMinIndex(rgb: number[]): number {
     return RgbHs.findIndex(rgb, 
       (value1, value2) => { 
         return value1 - value2;
@@ -88,7 +91,8 @@ export class RgbHs {
    * @param {number[]} rgb
    * @return {{value: number, maxIndex: number,  minIndex: number}}
    */
-  static calcChroma(rgb) {
+  static calcChroma(rgb: number[]): 
+    {value: number, maxIndex: number,  minIndex: number} {
     const maxIndex = RgbHs.findMaxIndex(rgb);
     const minIndex = RgbHs.findMinIndex(rgb);
     return {
@@ -102,7 +106,7 @@ export class RgbHs {
    * heu operator
    * @return {((v: number) => number)[]} 
    */
-  static get hueOperator() {
+  static get hueOperator(): ((value: number)=>number)[] {
     return [
       function(value) { return value % 6; },
       function(value) { return value + 2; },
@@ -116,13 +120,15 @@ export class RgbHs {
    * @param {{maxIndex: number}} chroma
    * @return {number} hue 
    */
-  static calcHue(rgb, chroma) {
+  static calcHue(
+    rgb: number[], 
+    chroma: {maxIndex: number, value: number}): number {
     let result;
     if (chroma.value != 0) {
       let tempValue;
       tempValue = rgb[(chroma.maxIndex + 1) % 3]
         - rgb[(chroma.maxIndex + 2) % 3];
-      tempValue /= rgb[chroma.maxIndex];
+      tempValue /= chroma.value;
       result = RgbHs.hueOperator[chroma.maxIndex](tempValue);
       result *= 60;
     } else {
@@ -131,13 +137,6 @@ export class RgbHs {
     return result;
   }
 
-  /**
-   * calculate cos 30 degree
-   * @return {number}
-   */
-  static get cos30() {
-    return Math.pow(3, 0.5) / 2;
-  }
 
   /**
    * calculate hue and chroma
@@ -145,7 +144,9 @@ export class RgbHs {
    * @return {{chroma: {value: number, maxIndex: number, minIndex: number}, 
    *           hue: number}}
    */
-  static calcHueChroma(rgb) {
+  static calcHueChroma(rgb: number[])
+    : {chroma: {value: number, maxIndex: number, minIndex: number}, 
+        hue: number} {
     const chroma = RgbHs.calcChroma(rgb)
     const hue = RgbHs.calcHue(rgb, chroma)
     return {
@@ -159,16 +160,19 @@ export class RgbHs {
    * @param {number[]} rgb
    * @return {{alpha: number, beta: number, hue2: number, chroma2: number}}
    */
-  static calcHueChroma2(rgb) {
+  static calcHueChroma2(
+    rgb: number[]):
+    {alpha: number, beta: number, hue2: number, chroma2: number} {
     const alpha = (2 * rgb[0] - rgb[1] - rgb[2]) / 2;
-    const beta = RgbHs.cos30 * (rgb[1] - rgb[2]);
+    const cos30 = Math.pow(3, 0.5) / 2;
+    const beta = cos30 * (rgb[1] - rgb[2]);
     const hue2 = Math.atan2(alpha, beta);
     const chroma2 = Math.sqrt(alpha * alpha + beta * beta);
     return {
-      alpha: alpha,
-      beta: beta,
-      hue2: hue2,
-      chroma2: chroma2
+      alpha,
+      beta,
+      hue2,
+      chroma2
     };
   }
 
@@ -178,7 +182,9 @@ export class RgbHs {
    * @param {number[]} coefficients
    * @return {number} luma value
    */
-  static luma(rgb, coefficients) {
+  static luma(
+    rgb: number[], 
+    coefficients: number[]): number {
     let result;
     result = rgb[0] * coefficients[0];
     for (var index = 1; index < 3; index++) {
@@ -192,7 +198,7 @@ export class RgbHs {
    * @param {number[]} rgb
    * @return {number} luma value
    */
-  static lumaY709(rgb) {
+  static lumaY709(rgb: number[]): number {
     return RgbHs.luma(rgb, [.21, .72, .07]);  
   }
 
@@ -201,7 +207,7 @@ export class RgbHs {
    * @param {number[]} rgb
    * @return {number} luma value
    */
-  static lumaY601(rgb) {
+  static lumaY601(rgb: number[]): number {
     return RgbHs.luma(rgb, [.3, .59, .11]);
   }
 
@@ -210,7 +216,7 @@ export class RgbHs {
    * @param {number[]} rgb
    * @return {number}
    */
-  static rgbMaxValue(rgb) {
+  static rgbMaxValue(rgb: number[]): number {
     return rgb[RgbHs.findMaxIndex(rgb)];
   }
 
@@ -219,7 +225,7 @@ export class RgbHs {
    * @param {number[]} rgb
    * @return {number}
    */
-  static rgbMinValue(rgb) {
+  static rgbMinValue(rgb: number[]): number {
     return rgb[RgbHs.findMinIndex(rgb)];
   }
 
@@ -228,7 +234,7 @@ export class RgbHs {
    * @param {number[]} rgb
    * @return {number}
    */
-  static rgbMinMaxAverage(rgb) {
+  static rgbMinMaxAverage(rgb: number[]): number {
     return (rgb[RgbHs.findMaxIndex(rgb)] + rgb[RgbHs.findMinIndex(rgb)]) / 2;
   }
 
@@ -237,7 +243,7 @@ export class RgbHs {
    * @param {number[]} rgb
    * @return {number}
    */
-  static rgbAverage(rgb) {
+  static rgbAverage(rgb: number[]): number {
     let result;
     let index;
     result = rgb[0];
@@ -259,7 +265,16 @@ export class RgbHs {
    *           luma: (rgb: number[]) => number
    *          }}
    */
-  static get lightness() {
+  static get lightness():
+    { average: (rgb: number[]) => number,
+      i: (rgb: number[]) => number,
+      max: (rgb: number[]) => number,
+      v: (rgb: number[]) => number,
+      minMaxAverage: (rgb: number[]) => number,
+      l: (rgb: number[]) => number,
+      lumaY709: (rgb: number[]) => number,
+      lumaY601: (rgb: number[]) => number,
+      luma: (rgb: number[]) => number }{
     return {
       average: RgbHs.rgbAverage,
       i: RgbHs.rgbAverage,
@@ -281,7 +296,10 @@ export class RgbHs {
    *            l: (rgb: number[], chroma: number, l: number) => number
    *          }}
    */
-  static get saturation() {
+  static get saturation(): 
+    { i: (rgb: number[], chroma: number, i: number) => number,
+      v: (rgb: number[], chroma: number, v: number) => number,
+      l: (rgb: number[], chroma: number, l: number) => number} {
     return {
       i: function(rgb, chroma, i) {
         let result;
@@ -318,7 +336,9 @@ export class RgbHs {
    * @param {number[]} rgb
    * @return {number[]} rgb
    */
-  static rgb255ToRgb1(rgb) {
+  static rgb255ToRgb1(
+    rgb: {red: number, green: number, blue: number}):
+      {red: number, green: number, blue: number} {
     return {
       red: rgb.red / 255.0,
       green: rgb.green / 255.0,
@@ -331,17 +351,18 @@ export class RgbHs {
    * @param {{red: number, green: number, blue: number}}
    * @return {{hue2: number, chroma2: number, v: number, saturation: number}}
    */
-  static rgbToHsv2(rgb) {
-    rgb = RgbHs.toRgbArray(rgb);
-    let hueChroma;
-    hueChroma = RgbHs.calcHueChroma2(rgb);
-    let v = RgbHs.lightness.v(rgb);
+  static rgbToHsv2(
+    rgb: {red: number, green: number, blue: number}):
+      {hue2: number, chroma2: number, v: number, saturation: number} {
+    const rgb0 = RgbHs.toRgbArray(rgb);
+    const hueChroma = RgbHs.calcHueChroma2(rgb0);
+    const v = RgbHs.lightness.v(rgb0);
        
     const result = {
       hue2: hueChroma.hue2,
       chroma2: hueChroma.chroma2,
-      v: v,
-      saturation: RgbHs.saturation.v(rgb, hueChroma.chroma2, v)
+      v,
+      saturation: RgbHs.saturation.v(rgb0, hueChroma.chroma2, v)
     };
     return result;
   }
@@ -350,16 +371,18 @@ export class RgbHs {
    * @param {{red: number, green: number, blue: number}}
    * @return {{hue2: number, chroma2: number, l: number, saturation: number}}
    */
-  static rgbToHsl2(rgb) {
-    rgb = RgbHs.toRgbArray(rgb);
-    const hueChroma = RgbHs.calcHueChroma2(rgb);
-    const l = RgbHs.lightness.l(rgb);
+  static rgbToHsl2(
+    rgb:{red: number, green: number, blue: number}):
+      {hue2: number, chroma2: number, l: number, saturation: number} {
+    const rgb0 = RgbHs.toRgbArray(rgb);
+    const hueChroma = RgbHs.calcHueChroma2(rgb0);
+    const l = RgbHs.lightness.l(rgb0);
        
     const result = {
       hue2: hueChroma.hue2,
       chroma2: hueChroma.chroma2,
-      l: l,
-      saturation: RgbHs.saturation.l(rgb, hueChroma.chroma2, l)
+      l,
+      saturation: RgbHs.saturation.l(rgb0, hueChroma.chroma2, l)
     };
     return result;
   }
@@ -367,9 +390,8 @@ export class RgbHs {
   /**
    * calculate chroma from hue
    * @param {number} hue
-   * @param {number} chroma
    */
-  static calcChromaRatioFromHue(hue) {
+  static calcChromaRatioFromHue(hue: number): number {
     const root3 = Math.sqrt(3);
     let angle;
     angle = hue % (Math.PI / 3);
@@ -379,8 +401,7 @@ export class RgbHs {
     x = root3 / (raise + root3);
     let y;
     y = raise * x;
-    let result;
-    result = Math.sqrt(x * x + y * y);
+    const result = Math.sqrt(x * x + y * y);
     return result;
   }
 
@@ -393,7 +414,13 @@ export class RgbHs {
    * @param {number} v - value for hsv
    * @param {(v: number, chroma: number, rgb: number[]) => number} vToColorValue
    */
-  static xyrvToRgb(x, y, r, v, vToColorValue) {
+  static xyrvToRgb(
+    x: number, 
+    y: number,
+    r: number, 
+    v: number, 
+    vToColorValue: (v: number, chroma: number, rgb: number[]) => number):
+    number[] | undefined {
     let theta;
     theta = Math.atan2(y, x);
     if (y > 0) {
@@ -408,8 +435,7 @@ export class RgbHs {
     const hue = theta;
     let result;
     if (xyRadius <= 1) {
-      let chroma;
-      chroma = xyRadius / RgbHs.calcChromaRatioFromHue(hue);
+      const chroma = xyRadius;
       result = RgbHs.hueChromaToRgb(hue, chroma, v, vToColorValue);
     } else {
       result = undefined;
@@ -424,8 +450,15 @@ export class RgbHs {
    * @param {number} v - value for hsv
    * @param {(v: number, chroma: number, rgb: number[]) => number} vToColorValue
    */
-  static hueChromaToRgb(hue, chroma, v, vToColorValue) {
-    const hue6 = hue / (Math.PI / 3);
+  static hueChromaToRgb(
+    hue: number, 
+    chroma: number, 
+    v: number, 
+    vToColorValue: (v:number, chroma:number, rgb:number[]) => number):
+    number[] {
+    var hue6 = hue / (Math.PI / 3);
+    hue6 = Math.min(hue6, 6)
+    hue6 = Math.max(hue6, 0) 
 
     const result = [0, 0, 0];
     if (chroma > 0) {
@@ -452,7 +485,8 @@ export class RgbHs {
    * @param {number[]} rgbTempValue
    * @return {number}
    */
-  static vToColorValue(v, chroma, rgbTempValue) {
+  static vToColorValue(v: number, chroma: number, rgbTempValue: number[]):
+    number {
     return v - chroma;
   }
 
@@ -463,7 +497,10 @@ export class RgbHs {
    * @param {number[]} rgbTempValue
    * @return {number}
    */
-  static lToColorValue(l, chroma, rgbTempValue) {
+  static lToColorValue(
+    l: number, 
+    chroma: number, 
+    rgbTempValue: number[]): number {
     return l - chroma / 2;  
   }
 
@@ -474,7 +511,10 @@ export class RgbHs {
    * @param {number[]} rgbTempValue
    * @return {number}
    */
-  static lumaY709ToColorValue(y709, chroma, rgbTempValue) {
+  static lumaY709ToColorValue(
+    y709: number, 
+    chroma: number, 
+    rgbTempValue: number[]): number {
     return y709 - RgbHs.lumaY709(rgbTempValue);
   }
 
@@ -485,7 +525,10 @@ export class RgbHs {
    * @param {number[]} rgbTempValue
    * @return {number}
    */
-  static lumaY601ToColorValue(y601, chroma, rgbTempValue) {
+  static lumaY601ToColorValue(
+    y601: number, 
+    chroma: number, 
+    rgbTempValue: number[]): number {
     return y601 - RgbHs.lumaY601(rgbTempValue);
   }
 
@@ -494,9 +537,11 @@ export class RgbHs {
    * @param {number} x
    * @param {number} y
    * @param {number} radius
-   * @return {number}
    */
-  static isInCircle(x, y, radius) {
+  static isInCircle(
+    x: number, 
+    y: number, 
+    radius: number): boolean {
     return Math.sqrt(x * x + y * y) < radius;
   }
 
@@ -510,7 +555,13 @@ export class RgbHs {
    *            luma: (v: number, chroma: number, rgb: number[]) => number
    *         }}
    */
-  static get indexValueToColorValueFunctions() {
+  static get indexValueToColorValueFunctions(): 
+    {
+      value: (v: number, chroma: number, rgb: number[]) => number,
+      lightness: (v: number, chroma: number, rgb: number[]) => number,
+      lumaY601: (v: number, chroma: number, rgb: number[]) => number,
+      lumaY709: (v: number, chroma: number, rgb: number[]) => number,
+      luma: (v: number, chroma: number, rgb: number[]) => number}{
     return {
        value: RgbHs.vToColorValue,
        lightness: RgbHs.lToColorValue,
@@ -527,7 +578,13 @@ export class RgbHs {
    * @param {Object | undefined} notCircleValue
    * @return {{rgb: number[], row: number, col: number}}
    */
-  static createColorCircle(radius, indexValue, notCircleValue) {
+  static createColorCircle(
+    radius: number, 
+    indexValue: { value: number, type: string }, 
+    notCircleValue: any): {
+        rgb: (number | any)[], 
+        row: number, 
+        col: number}  {
     const rgbValues = [];
     for (let rowIndex = 0; rowIndex < 2 * radius; rowIndex++) {
       const rowRgbValues = [];
@@ -569,7 +626,23 @@ export class RgbHs {
    *                    curRange: number[])=>void) => Promise
    *         }}
    */
-  static createColorCircleProgress(radius, indexValue, notCircleValue) {
+  static createColorCircleProgress(
+    radius: number, 
+    indexValue: { value: number, type: string}, 
+    notCircleValue: any): {
+      start:(progress:
+             (state: {
+                rgb: number[],
+                row: number,
+                col: number,
+                calcRowColumnIndex: (index: number) => number},
+                curRange: number[])=>void) => Promise<{
+                  state: {
+                    rgb: number[],
+                    row: number,
+                    col: number,
+                    calcRowColumnIndex: (index: number) => number},
+                    curRange: number[]}> } {
     let diameter;
     diameter = 2 * radius;
     var totalPixcels;
@@ -649,7 +722,13 @@ export class RgbHs {
 
     const colorCircleState = createColorCircleState();
     const startMethod = function(progress) {
-      const res = new Promise((resolve, regject) => {
+      const res = new Promise<{
+        state: {
+          rgb: number[],
+          row: number,
+          col: number,
+          calcRowColumnIndex: (index: number) => number},
+          curRange: number[]}>((resolve, regject) => {
         const timeoutCallBack = 
           createTimeoutMethod({
             notify: progress,
