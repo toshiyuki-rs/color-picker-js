@@ -141,6 +141,9 @@ export class UI {
         setTimeout(function() { this.syncValueUiWithValue() }.bind(this))
         this.postUpdateColorCircleCanvas()
       }
+      if (this.raiseEvent) {
+        this.notify('indexValue')
+      }    
     }
   }
 
@@ -601,9 +604,12 @@ export class UI {
    * @param {(type: string, sender: Object)=>void} listener
    */
   addEventListener(
-    type: string, 
+    type: string | null | undefined, 
     listener: (arg: {type: string, sender: Object})=>void) {
     if (typeof this.listeners !== 'undefined') {
+      if (!type) {
+        type = 'any'
+      }
       let listeners = this.listeners[type]
       if (typeof listeners === 'undefined') {
         listeners = [];
@@ -619,9 +625,12 @@ export class UI {
    * @param {(type: string, sender: Object)=>void} listener
    */
   removeEventListener(
-    type: string,
+    type: string | null | undefined,
     listener: (arg: {type: string, sender: Object})=>void) {
     if (typeof this.listeners !== 'undefined') {
+      if (!type) {
+        type = 'any'
+      }
       const listeners = this.listeners[type]
       if (typeof listeners !== 'undefined') {
         let indexToRemove
@@ -645,15 +654,21 @@ export class UI {
    */
   notify(type: string) {
     if (typeof this.listeners !== 'undefined') {
-      const listeners = this.listeners[type]
-      if (typeof listeners !== 'undefined') {
-        listeners.forEach(function (elem) { 
-          elem({ 
-            type, 
-            target: this
-          })
-        }.bind(this))
+      const listenersArray = [this.listeners[type]]
+      if (type !== 'any') {
+        listenersArray.push(this.listeners['any'])
       }
+      const uiObj = this
+      listenersArray.forEach((listeners) => {
+        if (listeners) {
+          listeners.forEach((elem) => { 
+            elem({ 
+              type, 
+              target: uiObj 
+            })
+          })
+        }
+      })
     }
   }
 
