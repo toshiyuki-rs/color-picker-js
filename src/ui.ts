@@ -601,11 +601,11 @@ export class UI {
   /**
    * add event listener
    * @param {string} type
-   * @param {(type: string, sender: Object)=>void} listener
+   * @param {(type: string, target: Object)=>void} listener
    */
   addEventListener(
     type: string | null | undefined, 
-    listener: (arg: {type: string, sender: Object})=>void) {
+    listener: (arg: {type: string, target: object})=>void) {
     if (typeof this.listeners !== 'undefined') {
       if (!type) {
         type = 'any'
@@ -622,11 +622,11 @@ export class UI {
   /**
    * remove event listener
    * @param {string} type
-   * @param {(type: string, sender: Object)=>void} listener
+   * @param {(type: string, target: object)=>void} listener
    */
   removeEventListener(
     type: string | null | undefined,
-    listener: (arg: {type: string, sender: Object})=>void) {
+    listener: (arg: {type: string, target: object})=>void) {
     if (typeof this.listeners !== 'undefined') {
       if (!type) {
         type = 'any'

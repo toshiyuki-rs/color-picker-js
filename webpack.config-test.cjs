@@ -7,8 +7,8 @@ webpackSetting = {}
 webpackSetting.mode = 'development'
 
 webpackSetting.entry = {
-  test: ['./src/color-test.js',
-          './src/ui.less']
+  test: ['./src/color-test.ts',
+          './src/color-test.less']
 }
 
 webpackSetting.plugins =[ 
@@ -44,12 +44,19 @@ webpackSetting.module = {
     },
     {
       test: /\.tsx?$/,
-      use: [{
-        loader: 'ts-loader',
-        options: {
-          configFile: 'tsconfig-test.json'
-        }
-      }],
+      use: [
+        {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'] 
+          } 
+        },
+        {
+          loader: 'ts-loader',
+          options: {
+            configFile: 'tsconfig-test.json'
+          }
+        }],
       exclude: /node_modules/,
     }
   ]
@@ -58,6 +65,10 @@ webpackSetting.module = {
 webpackSetting.output = {
   filename: '[name].bundle.js',
   path: path.resolve(__dirname, 'test') 
+}
+
+webpackSetting.resolve = {
+  extensions: ['.ts']
 }
 
 module.exports = webpackSetting

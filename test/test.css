@@ -1,0 +1,22 @@
+div.oc-color-controller {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+div.oc-color-circle-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* vi: se ts=2 sw=2 et: */
+div.color-input {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+
+/*# sourceMappingURL=test.css.map*/
