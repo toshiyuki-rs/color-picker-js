@@ -1,6 +1,6 @@
 {
   "name": "@oc-soft/color-picker",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "Provide user interface to select color",
   "main": "dist/index.js",
   "repository": {
