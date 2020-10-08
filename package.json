@@ -1,8 +1,9 @@
 {
   "name": "@oc-soft/color-picker",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "Provide user interface to select color",
   "main": "dist/index.js",
+  "types": "src/ui.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/toshiyuki-rs/color-picker-js.git"
